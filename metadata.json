@@ -1,0 +1,8 @@
+{
+  "name": "Remix StudentSpend",
+  "description": "Personal money tracker for students with transactions, budgets, emergency fund, and savings goals.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
