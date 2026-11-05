@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="en" data-theme="light"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>StudentSpend</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{--bg:#f3f5fa;--card:#fff;--tx:#10213f;--mu:#5b6985;--nv:#0f2748;--ac:#0e9f78;--wa:#c98a06;--er:#cf3f58;--bd:#dce2ee;--ef:#e9eefb;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0a1322;--card:#12203a;--tx:#e8eefb;--mu:#9aa8c6;--nv:#6c97f0;--bd:#24345a;--ef:#1a2c52;--ac:#2fd0a0;--wa:#e8b23a;--er:#ef6c82;color-scheme:dark}}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 "Segoe UI",system-ui,sans-serif;display:flex;min-height:100vh}
+nav{width:210px;background:#0f2748;color:#fff;padding:20px 12px;flex-shrink:0;position:sticky;top:0;height:100vh}
+nav h1{font-size:19px;margin:0 8px 18px;letter-spacing:.2px}
+nav a{display:block;color:#c5d3ee;text-decoration:none;padding:9px 12px;border-radius:8px;margin-bottom:3px}
+nav a.on,nav a:hover{background:#1d3c6b;color:#fff}
+main{flex:1;padding:24px;max-width:1000px;min-width:0}
+h2{margin:0 0 4px;font-size:22px}p.sub{margin:0 0 18px;color:var(--mu)}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin-bottom:16px}
+.c{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:16px;margin-bottom:16px}
+.g .c{margin:0}.c h3{margin:0 0 10px;font-size:15px}
+.k{color:var(--mu);font-size:13px}.v{font-size:24px;font-weight:700}
+.pos{color:var(--ac)}.neg{color:var(--er)}
+input,select,textarea,button{font:inherit;padding:8px 10px;border-radius:7px;border:1px solid var(--bd);background:var(--card);color:var(--tx)}
+button{background:var(--nv);color:#fff;border:0;cursor:pointer;font-weight:600}
+button.s{background:transparent;color:var(--er);border:1px solid var(--bd);padding:3px 9px;font-weight:500}
+button.o{background:transparent;color:var(--tx);border:1px solid var(--bd)}
+:focus-visible{outline:2px solid var(--nv);outline-offset:2px}
+.f{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}.f>*{flex:1 1 130px}
+.tw{overflow-x:auto}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:8px;border-bottom:1px solid var(--bd);white-space:nowrap}th{color:var(--mu);font-weight:600;font-size:13px}
+.bar{height:10px;background:var(--ef);border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ac)}
+.bar.w i{background:var(--wa)}.bar.x i{background:var(--er)}
+.row{display:flex;justify-content:space-between;gap:8px;margin:10px 0 4px}
+.cols{display:flex;align-items:flex-end;gap:14px;height:150px;padding-top:8px}
+.cols div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;font-size:12px;color:var(--mu)}
+.cols span{display:flex;align-items:flex-end;gap:3px;height:120px}.cols b{width:16px;border-radius:3px 3px 0 0;display:block}
+.msg{padding:10px 12px;border-radius:8px;margin-bottom:14px;background:var(--ef)}.msg.e{background:color-mix(in srgb,var(--er) 18%,var(--card))}.msg.w{background:color-mix(in srgb,var(--wa) 20%,var(--card))}
+.note{font-size:13px;color:var(--mu)}
+@media(max-width:720px){body{flex-direction:column}nav{width:100%;height:auto;position:static;display:flex;overflow-x:auto;padding:10px;gap:4px}nav h1{display:none}nav a{white-space:nowrap;margin:0}main{padding:16px}}
+body{font-family:"Plus Jakarta Sans","Segoe UI",system-ui,sans-serif;background-image:radial-gradient(circle at 100% 0,color-mix(in srgb,var(--ac) 12%,transparent),transparent 40%)}
+nav{background:linear-gradient(180deg,#0b1f3d,#12335f);padding:22px 14px}
+nav h1{font-size:20px;font-weight:800;display:flex;align-items:center}
+nav h1:before{content:"\20B9";display:inline-grid;place-items:center;width:32px;height:32px;margin-right:9px;border-radius:10px;background:linear-gradient(135deg,#19c39a,#5b8def);color:#fff;font-size:17px}
+nav a{padding:10px 12px;border-radius:10px;font-weight:600;font-size:14px}
+nav a.on{background:rgba(255,255,255,.12);box-shadow:inset 3px 0 0 #19c39a}
+h2{font-size:28px;font-weight:800;letter-spacing:-.4px}
+.c{border-radius:16px;box-shadow:0 8px 26px -14px rgba(15,39,72,.35);padding:20px}
+.g .c{border-top:3px solid var(--nv)}.g .c:nth-child(2){border-top-color:var(--ac)}.g .c:nth-child(3){border-top-color:var(--er)}.g .c:nth-child(4){border-top-color:var(--wa)}
+.hero{display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center;margin-bottom:16px;padding:26px;border-radius:20px;color:#fff;background:linear-gradient(135deg,#0f2748 0%,#1b4b8f 55%,#14a98a 130%);box-shadow:0 20px 40px -20px rgba(15,39,72,.8)}
+.hero .k{color:#c9d8f3}.big{font-size:42px;font-weight:800;letter-spacing:-1px;line-height:1.1}
+.pills span{display:inline-block;margin:4px 6px 0 0;padding:6px 12px;border-radius:99px;background:rgba(255,255,255,.15);font-size:13px;font-weight:600}
+button{border-radius:10px;padding:9px 16px;background:linear-gradient(135deg,#1b4b8f,#0f2748)}
+input,select{border-radius:10px;padding:9px 12px}
+.bar{height:12px;border-radius:99px}.bar i{border-radius:99px;background:linear-gradient(90deg,#14a98a,#5bd1b0)}
+.bar.w i{background:linear-gradient(90deg,#e8a317,#f3c75c)}.bar.x i{background:linear-gradient(90deg,#cf3f58,#ef7a8e)}
+.cols{height:180px}.cols span{height:150px}.cols b{width:22px;border-radius:6px 6px 0 0}
+tr:hover td{background:color-mix(in srgb,var(--ef) 55%,transparent)}
+.msg{border-left:4px solid var(--nv);border-radius:12px}.msg.e{border-left-color:var(--er)}.msg.w{border-left-color:var(--wa)}
+.c.ai{border-color:color-mix(in srgb,var(--ac) 50%,var(--bd));background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 9%,var(--card)),var(--card))}
+.c.ai h3:before{content:"\2726  ";color:var(--ac)}
+@media(max-width:720px){.big{font-size:34px}h2{font-size:24px}nav a.on{box-shadow:none}}
+nav{background:var(--side);color:var(--tx);border-right:1px solid var(--bd)}
+nav h1{color:var(--tx)}nav a{color:var(--mu)}
+nav a.on,nav a:hover{background:var(--ef);color:var(--nv)}nav a.on{box-shadow:inset 3px 0 0 var(--ac)}
+.hero{background:linear-gradient(135deg,var(--h1),var(--h2));box-shadow:0 18px 36px -20px var(--h1)}.hero .k{color:rgba(255,255,255,.9)}
+button{background:linear-gradient(135deg,var(--nv),var(--ac))}button.s,button.o{background:transparent}
+button.sel{background:var(--ef);color:var(--nv);border-color:var(--nv)}
+.g .c{border-top-color:var(--nv)}.g .c:nth-child(2){border-top-color:var(--ac)}
+input[type=color]{padding:2px;height:36px;width:56px;vertical-align:middle}
+@media(max-width:720px){nav{border-right:0;border-bottom:1px solid var(--bd)}}
+</style>
+<style>
+.pw{display:flex;gap:22px;align-items:center;flex-wrap:wrap}.pie{width:170px;height:170px;border-radius:50%;flex-shrink:0}.lg{margin:5px 0;font-size:14px}.lg i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:8px}
+.flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}.fb{padding:12px 16px;border-radius:12px;background:var(--ef);border:1px solid var(--bd);min-width:120px}.fb b{display:block;font-size:17px}.fa{font-size:22px;color:var(--mu)}.fc{display:flex;flex-direction:column;gap:8px}
+.mo{position:fixed;inset:0;background:rgba(10,20,40,.45);display:grid;place-items:center;z-index:50;padding:16px}.mb{background:var(--card);border-radius:16px;padding:22px;max-width:380px;width:100%;box-shadow:0 20px 50px -10px rgba(0,0,0,.5)}.mb input{width:100%;margin-bottom:10px}
+.badge{background:var(--er);color:#fff;border-radius:99px;font-size:12px;padding:1px 8px;margin-left:6px}
+body.ro main button,body.ro main input,body.ro main select{display:none}
+body.na nav,body.na main{display:none}
+body.na #tb{display:none}
+#tb{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);right:14px;z-index:30;display:flex;gap:8px;align-items:center}
+.tbb{border-radius:99px;box-shadow:0 6px 16px -8px rgba(0,0,0,.4)}
+.av{width:40px;height:40px;border-radius:50%;padding:0;font-weight:800;font-size:16px;display:grid;place-items:center;background:linear-gradient(135deg,var(--nv),var(--ac));color:#fff;box-shadow:0 6px 16px -8px rgba(0,0,0,.4)}
+.av.big2{width:56px;height:56px;font-size:22px;flex-shrink:0}
+main{padding-top:64px}@media(max-width:720px){main{padding-top:16px}nav{padding-right:70px}}
+#auth{position:fixed;inset:0;z-index:40;display:grid;place-items:center;padding:16px;background:linear-gradient(135deg,var(--h1),var(--h2));overflow:auto}
+.ab{background:var(--card);border-radius:20px;padding:28px;width:100%;max-width:400px;box-shadow:0 30px 60px -20px rgba(0,0,0,.5)}.ab h1{margin:0 0 4px;font-size:24px}.ab input[type=text],.ab input[type=password]{width:100%;margin-bottom:10px}.ab button.big{width:100%}
+</style></head><body>
+<nav aria-label="Main"><h1>StudentSpend</h1><div id="who" class="note" style="margin:-8px 8px 14px"></div>
+<a href="#dashboard">🏠 Dashboard</a><a href="#transactions">💸 Transactions</a><a href="#budgets">🎯 Budgets</a><a href="#savings">🐷 Savings</a><a href="#emergency">🛡️ Emergency Fund</a><a href="#insights">✨ Insights &amp; AI</a><a href="#categories">🏷️ Categories</a><a href="#share">🔗 Share</a><a href="#statement">🧾 Statement</a><a href="#trash">🗑️ Recently deleted</a><a href="#settings">⚙️ Settings</a><a href="#" onclick="signOut();return false">🚪 Sign out</a></nav>
+<div id="tb"><button class="av" id="av" onclick="showProfile()" aria-label="View profile">S</button></div>
+<main id="m"></main>
+<script>
+const DEF=["Food","Transport","Education","Hostel","Shopping","Entertainment","Bills","Health","Travel","Pocket Money","Other"];
+let S={tx:[],cats:[],budgets:{},overall:0,hard:false,ef:[],efTarget:0,goals:[],imports:[]};
+try{const r=localStorage.getItem("ss1");if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
+let flash=null,wd=null;
+const save=()=>{if(RO)return;try{localStorage.setItem(UK,JSON.stringify(S))}catch(e){}pushDb()};let RO=false,dbDoc=null,pt=null,UK='ss1',USER=null;
+const R=n=>"₹"+(Math.round(n*100)/100).toLocaleString("en-IN");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const allCats=()=>[...DEF,...S.cats];
+const today=()=>new Date().toISOString().slice(0,10);
+const mo=d=>d.slice(0,7);const curMo=()=>today().slice(0,7);
+const sum=a=>a.reduce((t,x)=>t+x.amount,0);
+const inc=()=>sum(S.tx.filter(t=>t.type=="income"));
+const exp=()=>sum(S.tx.filter(t=>t.type=="expense"));
+const efBal=()=>sum(S.ef.filter(e=>e.kind=="contribute"))-sum(S.ef.filter(e=>e.kind=="withdraw"));
+const gSaved=()=>S.goals.reduce((t,g)=>t+g.saved,0);
+const avail=()=>inc()-exp()-efBal()-gSaved();
+const spent=(cat,m)=>sum(S.tx.filter(t=>t.type=="expense"&&mo(t.date)==m&&(!cat||t.cat==cat)));
+function pb(p){const c=p>=100?"x":p>=80?"w":"";return `<div class="bar ${c}"><i style="width:${Math.min(p,100)}%"></i></div>`}
+function lvl(p){return p>=100?"Budget exceeded":p>=80?"Budget warning":"Normal"}
+function notice(){const f=flash;flash=null;return f?`<div class="msg ${f[0]}" role="status">${esc(f[1])}</div>`:""}
+function catOpts(sel){return allCats().map(c=>`<option ${c==sel?"selected":""}>${esc(c)}</option>`).join("")}
+const $=id=>document.getElementById(id);
+
+function dashboard(){
+ const m=curMo(),ms=spent(null,m),rem=S.overall?S.overall-ms:null;
+ const months=[...new Set(S.tx.map(t=>mo(t.date)))].sort().slice(-6);
+ const mx=Math.max(1,...months.map(x=>Math.max(sum(S.tx.filter(t=>t.type=="income"&&mo(t.date)==x)),spent(null,x))));
+ const bars=months.map(x=>{const i=sum(S.tx.filter(t=>t.type=="income"&&mo(t.date)==x)),e=spent(null,x);
+  return `<div><span><b style="height:${i/mx*100}%;background:var(--ac)" title="Income ${R(i)}"></b><b style="height:${e/mx*100}%;background:var(--er)" title="Expenses ${R(e)}"></b></span>${x}</div>`}).join("");
+ const bycat={};S.tx.filter(t=>t.type=="expense"&&mo(t.date)==m).forEach(t=>bycat[t.cat]=(bycat[t.cat]||0)+t.amount);
+ const cr=Object.entries(bycat).sort((a,b)=>b[1]-a[1]);
+ const recent=[...S.tx].sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id).slice(0,5);
+ return `<h2>Dashboard</h2><p class="sub">Everything below is calculated from your saved entries.</p>${notice()}
+ ${!S.tx.length?`<div class="msg">No transactions yet. <a href="#transactions">Add your first pocket money entry</a> to get started.</div>`:""}
+ <div class="hero"><div><div class="k">Available to spend</div><div class="big">${R(avail())}</div><div class="k">Money you can use right now</div></div><div class="pills"><span>🛡️ Emergency ${R(efBal())}</span><span>🐷 Goals ${R(gSaved())}</span></div></div>
+ <div class="g">
+ <div class="c"><div class="k">Total received</div><div class="v">${R(inc())}</div></div>
+ <div class="c"><div class="k">Total spent</div><div class="v">${R(exp())}</div></div>
+ <div class="c"><div class="k">Emergency Fund (protected)</div><div class="v">${R(efBal())}</div></div>
+ <div class="c"><div class="k">Monthly budget</div><div class="v">${S.overall?R(S.overall):"Not set"}</div><div class="note">${rem===null?"":"Remaining: "+R(rem)}</div></div></div>
+ <div class="c"><h3>Income vs expenses by month</h3>${months.length?`<div class="cols">${bars}</div><div class="note">Green: income · Red: expenses</div>`:`<div class="note">Add transactions to see this chart.</div>`}</div>
+ <div class="c"><h3>This month’s spending by category</h3>${cr.length?cr.map(([c,a])=>`<div class="row"><span>${esc(c)}</span><span>${R(a)} (${Math.round(a/ms*100)}%)</span></div><div class="bar"><i style="width:${a/ms*100}%"></i></div>`).join(""):`<div class="note">No expenses this month.</div>`}</div>
+ <div class="c"><h3>Recent transactions</h3>${recent.length?`<div class="tw"><table>${recent.map(t=>`<tr><td>${t.date}</td><td>${esc(t.desc)}</td><td>${esc(t.cat)}</td><td class="${t.type=="income"?"pos":"neg"}">${t.type=="income"?"+":"−"}${R(t.amount)}</td></tr>`).join("")}</table></div>`:`<div class="note">Nothing yet.</div>`}</div>`}
+
+function transactions(){
+ const q=($("q")||{}).value||"",fc=($("fc")||{}).value||"",ft=($("ft")||{}).value||"",so=($("so")||{}).value||"date";
+ let L=S.tx.filter(t=>t.desc.toLowerCase().includes(q.toLowerCase())&&(!fc||t.cat==fc)&&(!ft||t.type==ft));
+ L.sort(so=="amt"?(a,b)=>b.amount-a.amount:(a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+ return `<h2>Transactions</h2><p class="sub">Pocket money can arrive in any amount on any date. Add each entry as it happens.</p>${notice()}
+ <div class="c"><h3>Add transaction</h3><div class="f">
+ <select id="ty" aria-label="Type"><option value="income">Income</option><option value="expense" selected>Expense</option></select>
+ <input id="de" placeholder="Description" aria-label="Description"><input id="am" type="number" min="0.01" step="0.01" placeholder="Amount (₹)" aria-label="Amount">
+ <select id="ca" aria-label="Category">${catOpts("Food")}</select><input id="da" type="date" value="${today()}" aria-label="Date"></div>
+ <button onclick="addTx()">Save transaction</button> <span class="note">Income and expenses only. Emergency Fund transfers live on their own page.</span></div>
+ <div class="c"><div class="f"><input id="q" value="${esc(q)}" placeholder="Search description" oninput="go()" aria-label="Search">
+ <select id="fc" onchange="go()" aria-label="Filter category"><option value="">All categories</option>${catOpts(fc)}</select>
+ <select id="ft" onchange="go()" aria-label="Filter type"><option value="">Income and expense</option><option value="income" ${ft=="income"?"selected":""}>Income</option><option value="expense" ${ft=="expense"?"selected":""}>Expense</option></select>
+ <select id="so" onchange="go()" aria-label="Sort"><option value="date">Newest first</option><option value="amt" ${so=="amt"?"selected":""}>Largest first</option></select></div>
+ ${L.length?`<div class="tw"><table><tr><th>Date</th><th>Description</th><th>Category</th><th>Amount</th><th></th></tr>${L.map(t=>`<tr><td>${t.date}</td><td>${esc(t.desc)}</td><td>${esc(t.cat)}</td><td class="${t.type=="income"?"pos":"neg"}">${t.type=="income"?"+":"−"}${R(t.amount)}</td><td><button class="s" onclick="delTx(${t.id})">Delete</button></td></tr>`).join("")}</table></div>`:`<div class="note">No matching transactions.</div>`}</div>`}
+
+function addTx(){
+ const type=$("ty").value,desc=$("de").value.trim(),amount=parseFloat($("am").value),cat=type=="income"?"Pocket Money":$("ca").value,date=$("da").value;
+ if(!desc||!(amount>0)||!date){flash=["e","Enter a description, a positive amount and a date."];return render()}
+ if(type=="expense"){
+  if(amount>avail()){flash=["e","This expense is more than your available balance of "+R(avail())+". Add income first, or move money back from the Emergency Fund only if it is a genuine emergency."];return render()}
+  const m=date.slice(0,7),cb=S.budgets[cat];
+  if(S.hard||(S.strict&&S.strict[cat])){
+   if(cb&&spent(cat,m)+amount>cb){flash=["e",`Blocked by your in-app limit: ${cat} budget is ${R(cb)} and you have spent ${R(spent(cat,m))}. Raise the limit on the Budgets page to continue.`];return render()}
+   if(S.hard&&S.overall&&spent(null,m)+amount>S.overall){flash=["e",`Blocked by your in-app limit: monthly budget ${R(S.overall)} would be exceeded. Raise the limit on the Budgets page to continue.`];return render()}}
+ }
+ S.tx.push({id:Date.now(),type,desc,amount,cat,date});save();
+ let msg="Saved.";const m=date.slice(0,7);
+ if(type=="expense"){const cb=S.budgets[cat];if(cb&&spent(cat,m)>=cb*0.8)msg=`Saved. ${cat} budget: ${lvl(spent(cat,m)/cb*100)} (${Math.round(spent(cat,m)/cb*100)}%).`;
+  else if(S.overall&&spent(null,m)>=S.overall*0.8)msg=`Saved. Monthly budget: ${lvl(spent(null,m)/S.overall*100)}.`}
+ flash=["",msg];render()}
+function delTx(id){if(confirm("Delete this transaction? This cannot be undone.")){S.tx=S.tx.filter(t=>t.id!=id);save();flash=["","Transaction deleted."];render()}}
+
+function budgets(){
+ const m=curMo(),ms=spent(null,m),op=S.overall?ms/S.overall*100:0;
+ return `<h2>Budgets</h2><p class="sub">Spending for ${m}.</p>${notice()}
+ <div class="c"><h3>Monthly limit</h3><div class="f"><input id="ov" type="number" min="0" value="${S.overall||""}" placeholder="Overall monthly budget (₹)" aria-label="Overall budget"><button onclick="setOv()">Save limit</button></div>
+ ${S.overall?`<div class="row"><span>${R(ms)} of ${R(S.overall)}</span><span>${Math.round(op)}% · ${lvl(op)}</span></div>${pb(op)}`:`<div class="note">No monthly limit set.</div>`}
+ <p><label><input type="checkbox" ${S.hard?"checked":""} onchange="S.hard=this.checked;save();render()"> In-app spending restriction: refuse to record expenses that exceed a limit</label></p>
+ <div class="note">Warning mode (default) only alerts you. Restriction mode applies inside StudentSpend only. It cannot block real UPI, card or bank payments.</div></div>
+ <div class="c"><h3>Category budgets</h3><div class="f"><select id="bc" aria-label="Category">${catOpts("")}</select><input id="ba" type="number" min="1" placeholder="Amount (₹)" aria-label="Category budget"><button onclick="setB()">Set budget</button></div>
+ ${Object.keys(S.budgets).length?Object.entries(S.budgets).map(([c,b])=>{const s=spent(c,m),p=s/b*100;return `<div class="row"><span>${esc(c)} <button class="s" onclick="delB('${esc(c).replace(/'/g,"\\'")}')">Remove</button> <label class="note"><input type="checkbox" ${S.strict&&S.strict[c]?"checked":""} onchange="setStrict('${esc(c).replace(/'/g,"\\'")}',this.checked)"> Strict limit</label></span><span>${R(s)} of ${R(b)} · ${Math.round(p)}% · ${lvl(p)}</span></div>${pb(p)}`}).join(""):`<div class="note">No category budgets yet.</div>`}</div>`}
+function setOv(){const v=parseFloat($("ov").value);if(!(v>=0)){flash=["e","Enter a valid amount."];return render()}S.overall=v;save();flash=["","Monthly limit saved."];render()}
+function setB(){const v=parseFloat($("ba").value),c=$("bc").value;if(!(v>0)){flash=["e","Enter a positive budget amount."];return render()}S.budgets[c]=v;save();flash=["",`${c} budget saved.`];render()}
+function delB(c){delete S.budgets[c];save();render()}
+
+function emergency(){
+ const con=sum(S.ef.filter(e=>e.kind=="contribute")),wdw=sum(S.ef.filter(e=>e.kind=="withdraw")),p=S.efTarget?efBal()/S.efTarget*100:0;
+ const reasons=["Urgent medical needs","Essential emergency travel","Urgent family needs","Unexpected essential expenses","Other genuine emergencies"];
+ const wdBox=wd?`<div class="msg e"><b>Confirm emergency withdrawal</b><p>You are about to move ${R(wd.amt)} out of protected savings (reason: ${esc(wd.reason)}). Your Emergency Fund will become ${R(efBal()-wd.amt)}. Only continue for a genuine emergency.</p>
+  <button onclick="doWd()">Yes, withdraw ${R(wd.amt)}</button> <button class="o" onclick="wd=null;render()">Cancel</button></div>`
+  :`<div class="f"><input id="wa" type="number" min="1" placeholder="Amount (₹)" aria-label="Withdrawal amount"><select id="wr" aria-label="Reason">${reasons.map(r=>`<option>${r}</option>`).join("")}</select><input id="wn" placeholder="Optional explanation" aria-label="Explanation"></div><button onclick="reqWd()">Withdraw for Emergency</button>`;
+ return `<h2>Emergency Fund</h2><p class="sub"><b>Protected Emergency Savings — Reserved for Genuine Emergencies.</b></p>${notice()}
+ <div class="g"><div class="c"><div class="k">Balance</div><div class="v">${R(efBal())}</div></div><div class="c"><div class="k">Contributed</div><div class="v">${R(con)}</div></div><div class="c"><div class="k">Withdrawn</div><div class="v">${R(wdw)}</div></div><div class="c"><div class="k">Available to spend</div><div class="v">${R(avail())}</div></div></div>
+ <div class="c"><h3>Target</h3><div class="f"><input id="tg" type="number" min="0" value="${S.efTarget||""}" placeholder="Optional target (₹)" aria-label="Target"><button onclick="S.efTarget=Math.max(0,parseFloat($('tg').value)||0);save();render()">Save target</button></div>${S.efTarget?`<div class="row"><span>${Math.round(p)}% of ${R(S.efTarget)}</span></div>${pb(Math.min(p,99))}`:""}</div>
+ <div class="c"><h3>Add to Emergency Fund</h3><div class="f"><input id="ca2" type="number" min="1" placeholder="Amount (₹)" aria-label="Contribution"><input id="cn" placeholder="Optional note" aria-label="Note"></div><button onclick="contrib()">Reserve money</button></div>
+ <div class="c"><h3>Withdraw for Emergency</h3>${wdBox}</div>
+ <div class="c"><h3>History</h3>${S.ef.length?`<div class="tw"><table>${[...S.ef].reverse().map(e=>`<tr><td>${e.date}</td><td>${e.kind=="contribute"?"Contribution":"Emergency withdrawal"}</td><td>${R(e.amount)}</td><td>${esc(e.reason||e.note||"")}</td></tr>`).join("")}</table></div>`:`<div class="note">No activity yet.</div>`}</div>
+ <p class="note">This is an app-level safeguard, not a bank lock. It cannot stop you from spending the real money elsewhere.</p>`}
+function contrib(){const a=parseFloat($("ca2").value);if(!(a>0)){flash=["e","Enter a positive amount."];return render()}
+ if(a>avail()){flash=["e","You only have "+R(avail())+" available to reserve."];return render()}
+ S.ef.push({id:Date.now(),kind:"contribute",amount:a,note:$("cn").value.trim(),date:today()});save();flash=["",R(a)+" moved into protected savings."];render()}
+function reqWd(){const a=parseFloat($("wa").value);if(!(a>0)){flash=["e","Enter a positive amount."];return render()}
+ if(a>efBal()){flash=["e","Withdrawal is more than the Emergency Fund balance of "+R(efBal())+"."];return render()}
+ wd={amt:a,reason:$("wr").value,note:$("wn").value.trim()};render()}
+function doWd(){if(wd.amt>efBal()){wd=null;flash=["e","Balance changed. Try again."];return render()}
+ S.ef.push({id:Date.now(),kind:"withdraw",amount:wd.amt,reason:wd.reason+(wd.note?" — "+wd.note:""),date:today()});wd=null;save();flash=["","Withdrawal recorded. It is not income and not an expense; record any actual spending separately."];render()}
+
+function categories(){
+ return `<h2>Categories</h2><p class="sub">Custom categories work in transactions, budgets and filters.</p>${notice()}
+ <div class="c"><h3>Add category</h3><div class="f"><input id="nc" placeholder="e.g. Stationery" aria-label="New category"><button onclick="addCat()">Add category</button></div></div>
+ <div class="c"><h3>Your categories</h3>${S.cats.length?S.cats.map((c,i)=>`<div class="row"><span>${esc(c)} <span class="note">(${S.tx.filter(t=>t.cat==c).length} transactions)</span></span><span><button class="o" onclick="renCat(${i})">Rename</button> <button class="s" onclick="delCat(${i})">Delete</button></span></div>`).join(""):`<div class="note">None yet.</div>`}
+ <p class="note">Built-in: ${DEF.join(", ")}</p></div>`}
+const norm=s=>s.trim().replace(/\s+/g," ");
+const dup=n=>allCats().some(c=>c.toLowerCase()==n.toLowerCase());
+function addCat(){const n=norm($("nc").value);if(!n){flash=["e","Category name cannot be empty."];return render()}
+ if(dup(n)){flash=["e","That category already exists."];return render()}S.cats.push(n);save();flash=["",n+" added."];render()}
+function renCat(i){const old=S.cats[i],n=norm(prompt("New name for "+old,old)||"");if(!n||n==old)return;
+ if(dup(n)){flash=["e","That name is already used."];return render()}
+ S.tx.forEach(t=>{if(t.cat==old)t.cat=n});if(S.budgets[old]!=null){S.budgets[n]=S.budgets[old];delete S.budgets[old]}if(S.strict&&S.strict[old]){S.strict[n]=true;delete S.strict[old]}S.cats[i]=n;save();flash=["","Renamed everywhere."];render()}
+function delCat(i){const c=S.cats[i],n=S.tx.filter(t=>t.cat==c).length;
+ if(n&&!confirm(`${n} transactions use "${c}". They will be moved to "Other", not deleted. Continue?`))return;
+ if(!n&&!confirm(`Delete "${c}"?`))return;
+ S.tx.forEach(t=>{if(t.cat==c)t.cat="Other"});delete S.budgets[c];if(S.strict)delete S.strict[c];S.cats.splice(i,1);save();flash=["","Category deleted. Transactions kept."];render()}
+
+function data(){return `<h2>Export &amp; Data</h2><p class="sub">Your data stays in this browser only.</p>${notice()}
+ <div class="c"><h3>Export</h3><button onclick="exp2()">Download transactions (CSV)</button></div>
+ <div class="c"><h3>Delete all data</h3><button class="s" onclick="if(confirm('Delete ALL StudentSpend data from this browser?')){S={tx:[],cats:[],budgets:{},overall:0,hard:false,ef:[],efTarget:0,goals:[],imports:[],theme:S.theme,lang:S.lang,custom:S.custom};save();flash=['','All data deleted.'];render()}">Delete everything</button></div>
+ <div class="c"><h3>Not in this version</h3><p class="note">Not built here: full analytics page, flowchart page, settings page and a server database. There is no bank or UPI connection. The optional AI box on Insights uses Claude in the cloud, not a local model.</p></div>`}
+function exp2(){const rows=[["date","type","description","category","amount_inr"],...S.tx.map(t=>[t.date,t.type,'"'+t.desc.replace(/"/g,'""')+'"',t.cat,t.amount])];
+ const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([rows.map(r=>r.join(",")).join("\n")],{type:"text/csv"}));a.download="studentspend.csv";a.click()}
+
+function savings(){return `<h2>Savings goals</h2><p class="sub">Money in goals is set aside from your spendable balance. It is separate from the Emergency Fund.</p>${notice()}
+<div class="g"><div class="c"><div class="k">Total in goals</div><div class="v">${R(gSaved())}</div></div><div class="c"><div class="k">Available to spend</div><div class="v">${R(avail())}</div></div></div>
+<div class="c"><h3>New goal</h3><div class="f"><input id="gn" placeholder="Goal name" aria-label="Goal name"><input id="gt" type="number" min="1" placeholder="Target (₹)" aria-label="Target"><input id="gd" type="date" aria-label="Optional target date"></div><button onclick="addGoal()">Create goal</button></div>
+${S.goals.length?S.goals.map(g=>{const p=g.saved/g.target*100;return `<div class="c"><h3>${esc(g.name)}</h3><div class="row"><span>${R(g.saved)} of ${R(g.target)}${g.date?" · by "+g.date:""}</span><span>${Math.round(p)}%</span></div><div class="bar"><i style="width:${Math.min(p,100)}%"></i></div>
+<div class="f" style="margin-top:10px"><input id="gc${g.id}" type="number" min="1" placeholder="Amount (₹)" aria-label="Contribution"><button onclick="goalAdd(${g.id})">Add money</button><button class="s" onclick="delGoal(${g.id})">Delete goal</button></div>
+${g.hist.length?`<div class="note">History: ${g.hist.map(h=>h.date+" "+R(h.amount)).join(" · ")}</div>`:""}</div>`}).join(""):`<div class="msg">No goals yet. Create one above.</div>`}`}
+function addGoal(){const n=norm($("gn").value),t=parseFloat($("gt").value);if(!n||!(t>0)){flash=["e","Enter a goal name and a positive target."];return render()}
+S.goals.push({id:Date.now(),name:n,target:t,date:$("gd").value,saved:0,hist:[]});save();flash=["","Goal created."];render()}
+function goalAdd(id){const g=S.goals.find(x=>x.id==id),a=parseFloat($("gc"+id).value);if(!(a>0)){flash=["e","Enter a positive amount."];return render()}
+if(a>avail()){flash=["e","You only have "+R(avail())+" available."];return render()}
+g.saved+=a;g.hist.push({date:today(),amount:a});save();flash=["",R(a)+" added to "+g.name+"."];render()}
+function delGoal(id){const g=S.goals.find(x=>x.id==id);if(confirm(`Delete "${g.name}"? Its ${R(g.saved)} returns to your available balance. No transactions are deleted.`)){S.goals=S.goals.filter(x=>x.id!=id);save();render()}}
+
+let imp=null;
+const CK={Food:/zomato|swiggy|cafe|restaurant|canteen|mess|pizza|food/i,Transport:/uber|ola|rapido|metro|bus|irctc|petrol|fuel/i,Education:/book|course|udemy|fees|exam|print/i,Entertainment:/netflix|spotify|movie|bookmyshow|game/i,Shopping:/amazon|flipkart|myntra|ajio/i,Bills:/recharge|jio|airtel|electric|wifi|bill/i,Health:/pharm|medic|hospital|clinic/i};
+const suggest=d=>{for(const[c,r]of Object.entries(CK))if(r.test(d))return c;return"Other"};
+function parseCSV(t){const rows=[];let r=[],c="",q=false;for(let i=0;i<t.length;i++){const ch=t[i];if(q){if(ch=='"'&&t[i+1]=='"'){c+='"';i++}else if(ch=='"')q=false;else c+=ch}else if(ch=='"')q=true;else if(ch==","){r.push(c);c=""}else if(ch=="\n"||ch=="\r"){if(ch=="\r"&&t[i+1]=="\n")i++;r.push(c);c="";if(r.some(x=>x.trim()))rows.push(r);r=[]}else c+=ch}r.push(c);if(r.some(x=>x.trim()))rows.push(r);return rows}
+function nd(s){s=s.trim();let m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m)return m[0];m=s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);return m?`${m[3]}-${m[2].padStart(2,"0")}-${m[1].padStart(2,"0")}`:null}
+const num=s=>parseFloat(String(s||"").replace(/[₹,\s]/g,""));
+function onFile(f){if(!f)return;if(!/\.csv$/i.test(f.name)){flash=["e","Please choose a .csv file."];return render()}
+const rd=new FileReader();rd.onload=()=>{const rows=parseCSV(String(rd.result));if(rows.length<2){flash=["e","The file has no data rows."];return render()}
+const h=rows[0].map(x=>x.trim().toLowerCase()),col=(...n)=>h.findIndex(x=>n.some(k=>x.includes(k)));
+const di=col("date"),ds=col("desc","narration","particular","details","merchant"),ai=col("amount"),db=col("debit","withdraw"),cr=col("credit","deposit"),ti=col("type","dr/cr");
+if(di<0||ds<0||(ai<0&&db<0&&cr<0)){flash=["e","Could not find columns. The file needs date, description and amount (or debit and credit) columns."];return render()}
+imp=rows.slice(1).map(r=>{const date=nd(r[di]||"");let amount=0,type="expense";
+if(ai>=0){const v=num(r[ai]);amount=Math.abs(v);type=v<0?"expense":"income";if(ti>=0){const t=(r[ti]||"").toLowerCase();if(/cr|credit|income/.test(t))type="income";else if(/dr|debit|expense/.test(t))type="expense"}}
+else{const d=num(r[db])||0,c=num(r[cr])||0;if(c>0){amount=c;type="income"}else amount=d}
+const desc=(r[ds]||"").trim(),ok=!!date&&amount>0&&!!desc;
+const isDup=ok&&S.tx.some(t=>t.date==date&&t.amount==amount&&t.type==type&&t.desc.toLowerCase()==desc.toLowerCase());
+return{date,desc,amount,type,cat:type=="income"?"Pocket Money":suggest(desc),ok,isDup,use:ok&&!isDup}});render()};rd.readAsText(f)}
+function importPage(){return `<h2>Import CSV</h2><p class="sub">Upload a statement you downloaded yourself. Nothing is saved until you confirm.</p>${notice()}
+<div class="c"><input type="file" accept=".csv" onchange="onFile(this.files[0])" aria-label="CSV file"><p class="note">Needs date, description and amount columns (or separate debit and credit columns). With a single amount column and no type column, negative amounts are read as expenses and positive as income. StudentSpend never asks for bank passwords, UPI PINs or OTPs, and has no live bank link.</p></div>
+${imp?`<div class="c"><h3>Preview: ${imp.length} rows</h3><div class="tw"><table><tr><th>Use</th><th>Date</th><th>Description</th><th>Category</th><th>Type</th><th>Amount</th><th>Status</th></tr>
+${imp.map((x,i)=>`<tr><td><input type="checkbox" ${x.use?"checked":""} ${x.ok?"":"disabled"} onchange="imp[${i}].use=this.checked" aria-label="Import row ${i+1}"></td><td>${x.date||"?"}</td><td><input value="${esc(x.desc)}" onchange="imp[${i}].desc=this.value"></td><td><select onchange="imp[${i}].cat=this.value">${catOpts(x.cat)}</select></td><td>${x.type}</td><td>${x.amount?R(x.amount):"?"}</td><td>${!x.ok?"Invalid row":x.isDup?"Possible duplicate":"New"}</td></tr>`).join("")}</table></div>
+<p><button onclick="commitImp()">Import selected rows</button> <button class="o" onclick="imp=null;render()">Cancel</button></p></div>`:""}
+<div class="c"><h3>Import history</h3>${S.imports.length?`<div class="tw"><table>${[...S.imports].reverse().map(h=>`<tr><td>${esc(h.date)}</td><td>${h.n} imported</td><td>${h.skipped} skipped</td></tr>`).join("")}</table></div>`:`<div class="note">No imports yet.</div>`}</div>`}
+function commitImp(){const rows=imp.filter(x=>x.use&&x.ok&&x.desc.trim());if(!rows.length){flash=["e","Select at least one valid row."];return render()}
+rows.forEach((x,i)=>S.tx.push({id:Date.now()+i,type:x.type,desc:x.desc.trim(),amount:x.amount,cat:x.cat,date:x.date,src:"csv"}));
+S.imports.push({date:new Date().toLocaleString(),n:rows.length,skipped:imp.length-rows.length});const n=rows.length;imp=null;save();flash=["",`Imported ${n} transactions.`];render()}
+
+let ans="";
+const pmo=()=>{const d=new Date(),p=new Date(d.getFullYear(),d.getMonth()-1,1);return p.getFullYear()+"-"+String(p.getMonth()+1).padStart(2,"0")};
+const QS=[["How much can I spend?",()=>`You have ${R(avail())} available to spend. ${R(efBal())} is protected in the Emergency Fund and ${R(gSaved())} is set aside in savings goals.`],
+["Where did most of my money go this month?",()=>{const b={};S.tx.filter(t=>t.type=="expense"&&mo(t.date)==curMo()).forEach(t=>b[t.cat]=(b[t.cat]||0)+t.amount);const e=Object.entries(b).sort((a,c)=>c[1]-a[1]);return e.length?`${e[0][0]} is your biggest category at ${R(e[0][1])}.${e.length>1?" Next: "+e.slice(1,3).map(x=>x[0]+" "+R(x[1])).join(", ")+".":""}`:"No expenses recorded this month yet."}],
+["Am I close to my budget?",()=>{if(!S.overall)return"You have not set a monthly budget yet. Set one on the Budgets page.";const s=spent(null,curMo()),p=s/S.overall*100;return `You have spent ${R(s)} of ${R(S.overall)} (${Math.round(p)}%): ${lvl(p)}. Remaining: ${R(Math.max(0,S.overall-s))}.`}],
+["How does this month compare with last month?",()=>{const a=spent(null,curMo()),b=spent(null,pmo());if(!b)return"No spending was recorded last month, so there is nothing to compare with.";const d=a-b;return `This month ${R(a)}, last month ${R(b)}: ${d>=0?"up":"down"} ${R(Math.abs(d))} (${Math.round(Math.abs(d)/b*100)}%).`}],
+["How much have I saved?",()=>`Emergency Fund: ${R(efBal())}. Savings goals: ${R(gSaved())}. Total set aside: ${R(efBal()+gSaved())}.`],
+["How can I spread my remaining money?",()=>{const left=S.overall?S.overall-spent(null,curMo()):avail(),dt=new Date(),days=new Date(dt.getFullYear(),dt.getMonth()+1,0).getDate()-dt.getDate()+1;return left>0?`You have ${R(left)} left ${S.overall?"in this month's budget":"to spend"} and ${days} days left in the month, about ${R(left/days)} per day.`:"You have no spendable amount left under your current limit."}]];
+function ask(i){ans=QS[i][1]();render()}
+function insights(){return `<h2>Insights</h2><p class="sub">Quick answers are calculated on your device. For anything else, ask the AI assistant below.</p>${notice()}
+<div class="c"><div class="f">${QS.map((q,i)=>`<button class="o" onclick="ask(${i})">${q[0]}</button>`).join("")}</div>${ans?`<div class="msg" role="status">${esc(ans)}</div>`:`<div class="note">Pick a question.</div>`}</div>
+<div class="c ai"><h3>Ask the AI assistant</h3><p class="note">When you press Ask, a summary of your records (totals, categories, budgets, recent transactions) is sent to Claude. It runs in the cloud, not on your device. It can explain and suggest, but it cannot change your records.</p>
+<div class="f"><input id="aq" placeholder="e.g. How can I cut my food spending?" aria-label="Question for AI" onkeydown="if(event.key=='Enter')askAI()"><button id="ab" onclick="askAI()">Ask AI</button></div><div id="ao" class="msg" role="status" style="display:none;white-space:pre-wrap"></div></div>`}
+
+function ctx(){const m=curMo(),b={};S.tx.filter(t=>t.type=="expense"&&mo(t.date)==m).forEach(t=>b[t.cat]=(b[t.cat]||0)+t.amount);
+return JSON.stringify({currency:"INR",month:m,available:avail(),totalIncome:inc(),totalExpenses:exp(),emergencyFund:efBal(),goalsSaved:gSaved(),monthlyBudget:S.overall||null,thisMonthSpendByCategory:b,lastMonthSpend:spent(null,pmo()),categoryBudgets:S.budgets,goals:S.goals.map(g=>({name:g.name,target:g.target,saved:g.saved})),recentTransactions:[...S.tx].sort((a,c)=>c.date.localeCompare(a.date)).slice(0,30).map(t=>({date:t.date,type:t.type,desc:t.desc,category:t.cat,amount:t.amount}))})}
+async function askAI(){const q=$("aq").value.trim(),o=$("ao");if(!q)return;o.style.display="block";
+const sample=window.claude?await window.claude.use("sample"):null;
+if(!sample){o.textContent="The AI assistant is not available in this view. Use the question buttons above.";return}
+o.textContent="Thinking…";$("ab").disabled=true;
+try{const r=await sample(`You are a friendly money coach for an Indian college student. Use ONLY the figures in the JSON below and never invent numbers. If data is missing, say so. Answer in under 150 words, in plain language, with amounts in ₹. You cannot change records; suggest actions the student can take themselves.\n\nDATA:\n${ctx()}\n\nQUESTION: ${q}`,{cache:false,modelTier:"quick",onText:({text})=>{o.textContent=text}});o.textContent=r.text}
+catch(e){o.textContent=e&&e.code=="not_granted"?"Permission was not granted, so the AI can’t answer.":"The AI could not answer right now. Try again later."}
+$("ab").disabled=false}
+
+function setStrict(c,v){S.strict=S.strict||{};if(v)S.strict[c]=true;else delete S.strict[c];save();flash=["",v?c+" now has a strict limit: expenses over its budget are refused inside StudentSpend.":c+" is back to warning-only."];render()}
+const TH={light:{bg:"#f6f8fc",card:"#ffffff",tx:"#1c2a44",mu:"#667491",nv:"#2f6fed",ac:"#12a594",bd:"#e3e9f4",ef:"#eaf1ff",side:"#ffffff",h1:"#3b82f6",h2:"#14b8a6",wa:"#d99a0b",er:"#e0536a"},dark:{bg:"#0b1424",card:"#12203a",tx:"#e8eefb",mu:"#9aa8c6",nv:"#6c97f0",ac:"#2fd0a0",bd:"#24345a",ef:"#1a2c52",side:"#0f1c33",h1:"#1b4b8f",h2:"#14a98a",wa:"#e8b23a",er:"#ef6c82"}};
+const CU0={nv:"#7c3aed",ac:"#ec4899",bg:"#fdf6ff"};
+function applyTheme(){const t=S.theme||"light",cu=Object.assign({},CU0,S.custom);const p=t=="custom"?Object.assign({},TH.light,{nv:cu.nv,ac:cu.ac,bg:cu.bg,h1:cu.nv,h2:cu.ac,ef:`color-mix(in srgb,${cu.nv} 12%,#fff)`}):(TH[t]||TH.light);
+const r=document.documentElement;r.dataset.theme="light";r.style.colorScheme=t=="dark"?"dark":"light";for(const k in p)r.style.setProperty("--"+k,p[k])}
+function setTheme(t){S.theme=t;save();render()}
+function setCu(k,v){S.custom=Object.assign({},CU0,S.custom,{[k]:v});save();applyTheme()}
+const HI={"Dashboard":"डैशबोर्ड","Transactions":"लेन-देन","Budgets":"बजट","Savings":"बचत","Emergency Fund":"आपातकालीन फंड","Import CSV":"CSV आयात","Insights & AI":"इनसाइट्स और AI","Insights":"इनसाइट्स","Categories":"श्रेणियाँ","Settings":"सेटिंग्स","Export & Data":"निर्यात और डेटा","Available to spend":"खर्च के लिए उपलब्ध","Money you can use right now":"अभी इस्तेमाल कर सकने वाला पैसा","Total received":"कुल प्राप्त","Total spent":"कुल खर्च","Emergency Fund (protected)":"आपातकालीन फंड (सुरक्षित)","Monthly budget":"मासिक बजट","Recent transactions":"हाल के लेन-देन","Income vs expenses by month":"मासिक आय बनाम खर्च","Add transaction":"लेन-देन जोड़ें","Save transaction":"लेन-देन सहेजें","Monthly limit":"मासिक सीमा","Save limit":"सीमा सहेजें","Category budgets":"श्रेणी बजट","Set budget":"बजट सेट करें","Strict limit":"कड़ी सीमा","Savings goals":"बचत लक्ष्य","New goal":"नया लक्ष्य","Create goal":"लक्ष्य बनाएँ","Add money":"पैसे जोड़ें","Delete goal":"लक्ष्य हटाएँ","Delete":"हटाएँ","Remove":"हटाएँ","Cancel":"रद्द करें","Reserve money":"पैसे सुरक्षित करें","Add to Emergency Fund":"आपातकालीन फंड में जोड़ें","Withdraw for Emergency":"आपात निकासी","History":"इतिहास","Add category":"श्रेणी जोड़ें","Rename":"नाम बदलें","Import selected rows":"चुनी पंक्तियाँ आयात करें","Import history":"आयात इतिहास","Ask AI":"AI से पूछें","Ask the AI assistant":"AI सहायक से पूछें","Theme":"थीम","Language":"भाषा","Light":"लाइट","Dark":"डार्क","Custom":"कस्टम","Export":"निर्यात","Description":"विवरण","Amount (₹)":"राशि (₹)","Search description":"विवरण खोजें","Date":"तारीख","Category":"श्रेणी","Amount":"राशि","Everything below is calculated from your saved entries.":"नीचे सब कुछ आपकी सहेजी प्रविष्टियों से गणना किया गया है।","Make StudentSpend look and read the way you like.":"StudentSpend को अपनी पसंद के अनुसार बदलें।"};
+function translate(){const L=S.lang||"en",D=L=="hi"?HI:null;document.documentElement.lang=L=="hi"?"hi":"en";
+const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n;
+while(n=w.nextNode()){if(/^(SCRIPT|STYLE|OPTION|TEXTAREA)$/.test(n.parentNode.tagName))continue;if(n._o===undefined)n._o=n.nodeValue;const o=n._o,pre=o.match(/^[^A-Za-z]*/)[0],core=o.slice(pre.length).trim();n.nodeValue=D&&D[core]?pre+D[core]+(/\s$/.test(o)?" ":""):o}
+document.querySelectorAll("[placeholder]").forEach(e=>{if(e._p===undefined)e._p=e.placeholder;e.placeholder=D&&D[e._p]||e._p})}
+function settings(){const t=S.theme||"light",cu=Object.assign({},CU0,S.custom);
+return `<h2>Settings</h2><p class="sub">Make StudentSpend look and read the way you like.</p>
+<div class="c"><h3>Theme</h3><div class="f">${["light","dark","custom"].map(x=>`<button class="o ${t==x?"sel":""}" onclick="setTheme('${x}')">${{light:"Light",dark:"Dark",custom:"Custom"}[x]}</button>`).join("")}</div>
+${t=="custom"?`<div class="f"><label class="note">Main colour <input type="color" value="${cu.nv}" onchange="setCu('nv',this.value)"></label><label class="note">Accent colour <input type="color" value="${cu.ac}" onchange="setCu('ac',this.value)"></label><label class="note">Background <input type="color" value="${cu.bg}" onchange="setCu('bg',this.value)"></label></div>`:""}</div>
+<div class="c"><h3>Language</h3><select onchange="S.lang=this.value;save();render()" aria-label="Language"><option value="en" ${S.lang!="hi"?"selected":""}>English</option><option value="hi" ${S.lang=="hi"?"selected":""}>हिन्दी (Hindi)</option></select><p class="note">Hindi covers menus, page titles and the main buttons. Your own entries are never translated.</p></div>`}
+S.trash=(S.trash||[]).filter(x=>Date.now()-x.at<30*864e5);
+function pushDb(){if(!dbDoc||RO||!USER)return;clearTimeout(pt);pt=setTimeout(()=>{try{dbDoc.set({json:JSON.stringify(Object.assign({},S,{trash:[]})),at:Date.now()}).catch(()=>{})}catch(e){}},800)}
+function toTrash(k,i){S.trash=S.trash||[];S.trash.push({kind:k,item:JSON.parse(JSON.stringify(i)),at:Date.now()})}
+function cfm(msg,fn,inp){const d=document.createElement('div');d.className='mo';d.innerHTML=`<div class='mb' role='dialog' aria-modal='true'><p>${esc(msg)}</p>${inp!=null?`<input id='mi' value="${esc(inp)}">`:''}<div class='f'><button id='my'>Confirm</button><button class='o' id='mn'>Cancel</button></div></div>`;document.body.appendChild(d);const x=()=>d.remove();$('mn').onclick=x;$('my').onclick=()=>{const v=inp!=null?$('mi').value:null;x();fn(v)};(inp!=null?$('mi'):$('mn')).focus()}
+async function dl(name,text){const d=window.claude?await window.claude.use('downloads'):null;if(!d){flash=['e','Downloads are not available in this view.'];return render()}try{await d.save({filename:name,data:'\ufeff'+text});flash=['','Saved '+name+'.']}catch(e){flash=['e','The file was not saved.']}render()}
+const q2=s=>'"'+String(s).replace(/"/g,'""')+'"';
+function exp2(){dl('studentspend-transactions.csv',[['date','type','description','category','amount_inr'],...S.tx.map(t=>[t.date,t.type,q2(t.desc),q2(t.cat),t.amount])].map(r=>r.join(',')).join('\n'))}
+function delTx(id){const t=S.tx.find(x=>x.id==id);if(!t)return;cfm(`Delete "${t.desc}"? You can restore it from Recently deleted for 30 days.`,()=>{toTrash('tx',t);S.tx=S.tx.filter(x=>x.id!=id);save();flash=['','Moved to Recently deleted.'];render()})}
+function delGoal(id){const g=S.goals.find(x=>x.id==id);if(!g)return;cfm(`Delete goal "${g.name}"? Its ${R(g.saved)} returns to your available balance. You can restore it for 30 days.`,()=>{toTrash('goal',g);S.goals=S.goals.filter(x=>x.id!=id);save();flash=['','Goal moved to Recently deleted.'];render()})}
+function delCat(i){const c=S.cats[i],n=S.tx.filter(t=>t.cat==c).length;cfm(n?`${n} transactions use "${c}". They will move to "Other"; nothing is deleted.`:`Delete category "${c}"?`,()=>{S.tx.forEach(t=>{if(t.cat==c)t.cat='Other'});delete S.budgets[c];if(S.strict)delete S.strict[c];S.cats.splice(i,1);save();flash=['','Category deleted. Transactions kept.'];render()})}
+function renCat(i){const old=S.cats[i];cfm('New name for this category',v=>{const n=norm(v||'');if(!n||n==old)return;if(dup(n)){flash=['e','That name is already used.'];return render()}S.tx.forEach(t=>{if(t.cat==old)t.cat=n});if(S.budgets[old]!=null){S.budgets[n]=S.budgets[old];delete S.budgets[old]}if(S.strict&&S.strict[old]){S.strict[n]=true;delete S.strict[old]}S.cats[i]=n;save();flash=['','Renamed everywhere.'];render()},old)}
+function delAll(){cfm('Delete ALL your data? It moves to Recently deleted and can be restored for 30 days.',()=>{const snap=Object.assign({},S,{trash:[]}),keep={theme:S.theme,lang:S.lang,custom:S.custom,profile:S.profile},tr=(S.trash||[]).concat([{kind:'all',item:JSON.parse(JSON.stringify(snap)),at:Date.now()}]);S=Object.assign({tx:[],cats:[],budgets:{},overall:0,hard:false,ef:[],efTarget:0,goals:[],imports:[],trash:tr},keep);save();flash=['','All data moved to Recently deleted.'];render()})}
+function restore(k){const x=S.trash[k];if(!x)return;if(x.kind=='all'){const tr=S.trash.filter((_,i)=>i!=k);S=Object.assign({},x.item,{trash:tr});save();flash=['','All data restored.'];return render()}
+if(x.kind=='tx'){if(!S.tx.some(t=>t.id==x.item.id))S.tx.push(x.item);if(!allCats().includes(x.item.cat))S.cats.push(x.item.cat)}else if(!S.goals.some(g=>g.id==x.item.id))S.goals.push(x.item);S.trash.splice(k,1);save();flash=['','Restored.'];render()}
+function purge(k){cfm('Delete this item forever? This cannot be undone.',()=>{S.trash.splice(k,1);save();render()})}
+function trashPage(){const T=S.trash||[];return `<h2>Recently deleted</h2><p class='sub'>Deleted items stay here for 30 days, then are removed for good.</p>${notice()}<div class='c'>${T.length?`<div class='tw'><table><tr><th>Item</th><th>Details</th><th>Days left</th><th></th></tr>${T.map((x,k)=>`<tr><td>${x.kind=='tx'?'Transaction':x.kind=='goal'?'Savings goal':'All data'}</td><td>${x.kind=='tx'?esc(x.item.desc)+' · '+R(x.item.amount):x.kind=='goal'?esc(x.item.name)+' · '+R(x.item.saved):'Full backup'}</td><td>${Math.max(0,Math.ceil(30-(Date.now()-x.at)/864e5))}</td><td><button onclick='restore(${k})'>Restore</button> <button class='s' onclick='purge(${k})'>Delete forever</button></td></tr>`).join('')}</table></div>`:`<div class='note'>Nothing here.</div>`}</div>`}
+function data(){return `<h2>Export &amp; Data</h2><p class='sub'>Download your records or manage your data.</p>${notice()}<div class='c'><h3>Export</h3><div class='f'><button onclick='exp2()'>Download transactions (CSV)</button><button class='o' onclick="location.hash='statement'">Open statement</button></div><p class='note'>You will be asked to confirm the save.</p></div><div class='c'><h3>Delete all data</h3><p class='note'>Everything moves to Recently deleted and can be restored for 30 days.</p><button class='s' onclick='delAll()'>Delete everything</button></div>`}
+function saveProfile(){S.profile={name:$('pn').value.trim(),college:$('pc').value.trim(),email:$('pe').value.trim(),parent:$('pp').value.trim(),parentEmail:$('ppe').value.trim()};save();flash=['','Profile saved.'];render()}
+function who(){const p=S.profile||{},e=$('who');if(e)e.textContent=(RO?'👪 Parent view (read only)'+(p.name?' · '+p.name:''):(p.name?'Hi, '+p.name:'Profile not set'))}
+function settings(){const t=S.theme||'light',cu=Object.assign({},CU0,S.custom),p=S.profile||{},v=k=>esc(p[k]||'');
+return `<h2>Settings</h2><p class='sub'>Make StudentSpend look and read the way you like.</p>${notice()}
+<div class='c'><h3>Profile</h3><div class='f'><input id='pn' value="${v('name')}" placeholder='Your name' aria-label='Name'><input id='pc' value="${v('college')}" placeholder='College' aria-label='College'><input id='pe' value="${v('email')}" placeholder='Your email' aria-label='Email'></div><div class='f'><input id='pp' value="${v('parent')}" placeholder='Parent or guardian name' aria-label='Parent name'><input id='ppe' value="${v('parentEmail')}" placeholder='Parent email' aria-label='Parent email'></div><button onclick='saveProfile()'>Save profile</button></div>
+<div class='c'><h3>Parent access</h3><p class='note'>${dbDoc?'✅ Sync is on.':'Sync is not available in this view.'} Invite your parent with this page’s Share option in claude.ai. When they open it signed in, they see your transactions, budgets, savings and Emergency Fund in read-only mode. It updates each time you save. They cannot edit anything. Anyone you share the page with can see your financial data.</p></div>
+<div class='c'><h3>Theme</h3><div class='f'>${['light','dark','custom'].map(x=>`<button class='o ${t==x?'sel':''}' onclick="setTheme('${x}')">${{light:'Light',dark:'Dark',custom:'Custom'}[x]}</button>`).join('')}</div>${t=='custom'?`<div class='f'><label class='note'>Main colour <input type='color' value='${cu.nv}' onchange="setCu('nv',this.value)"></label><label class='note'>Accent colour <input type='color' value='${cu.ac}' onchange="setCu('ac',this.value)"></label><label class='note'>Background <input type='color' value='${cu.bg}' onchange="setCu('bg',this.value)"></label></div>`:''}</div>
+<div class='c'><h3>Language</h3><select onchange='S.lang=this.value;save();render()' aria-label='Language'><option value='en' ${S.lang!='hi'?'selected':''}>English</option><option value='hi' ${S.lang=='hi'?'selected':''}>हिन्दी (Hindi)</option></select><p class='note'>Hindi covers menus, page titles and the main buttons.</p></div>`}
+const PAL=['#2f6fed','#12a594','#e0536a','#d99a0b','#8b5cf6','#ec4899','#0ea5e9','#84cc16','#f97316','#64748b','#14b8a6'];
+function pie(map){const e=Object.entries(map).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]),t=e.reduce((s,x)=>s+x[1],0);if(!t)return `<div class='note'>No data to chart yet.</div>`;let a=0;const g=e.map((x,i)=>{const s=a;a+=x[1]/t*100;return `${PAL[i%PAL.length]} ${s}% ${a}%`}).join(',');return `<div class='pw'><div class='pie' style='background:conic-gradient(${g})' role='img' aria-label='Pie chart'></div><div>${e.map((x,i)=>`<div class='lg'><i style='background:${PAL[i%PAL.length]}'></i>${esc(x[0])} <b>${R(x[1])}</b> (${Math.round(x[1]/t*100)}%)</div>`).join('')}</div></div>`}
+function line(L,ser){const W=560,H=190,p=28,mx=Math.max(1,...ser.flatMap(s=>s.v)),X=i=>p+(L.length>1?i*(W-2*p)/(L.length-1):(W-2*p)/2),Y=v=>H-p-v/mx*(H-2*p);return `<svg viewBox='0 0 ${W} ${H}' style='width:100%;height:auto' role='img' aria-label='Trend graph'><line x1='${p}' y1='${H-p}' x2='${W-p}' y2='${H-p}' stroke='#9aa8c6' stroke-opacity='.5'/>${ser.map(s=>`<polyline fill='none' stroke='${s.c}' stroke-width='3' points='${s.v.map((v,i)=>X(i)+','+Y(v)).join(' ')}'/>${s.v.map((v,i)=>`<circle cx='${X(i)}' cy='${Y(v)}' r='4' fill='${s.c}'><title>${s.n} ${L[i]}: ${R(v)}</title></circle>`).join('')}`).join('')}${L.map((l,i)=>`<text x='${X(i)}' y='${H-8}' font-size='11' text-anchor='middle' fill='#9aa8c6'>${l.slice(2)}</text>`).join('')}</svg><div class='note'><span style='color:#12a594'>●</span> Income <span style='color:#e0536a'>●</span> Expenses</div>`}
+const mons=c=>[...new Set(S.tx.filter(t=>!c||t.cat==c).map(t=>mo(t.date)))].sort().slice(-6);
+const ms2=(L,ty,c)=>L.map(x=>sum(S.tx.filter(t=>t.type==ty&&mo(t.date)==x&&(!c||t.cat==c))));
+function byCat(f){const b={};S.tx.filter(f).forEach(t=>b[t.cat]=(b[t.cat]||0)+t.amount);return b}
+function alerts(){const m=curMo(),A=[],ms=spent(null,m);if(S.overall){const p=ms/S.overall*100;if(p>=100)A.push(['e',`You have crossed your monthly budget: ${R(ms)} of ${R(S.overall)}.`]);else if(p>=80)A.push(['w',`You have used ${Math.round(p)}% of your monthly budget.`])}
+Object.entries(S.budgets).forEach(([c,b])=>{const p=spent(c,m)/b*100;if(p>=100)A.push(['e',`${c}: over budget (${R(spent(c,m))} of ${R(b)}). Spend less here.`]);else if(p>=80)A.push(['w',`${c}: ${Math.round(p)}% of its budget is used.`])});
+const by=byCat(t=>t.type=='expense'&&mo(t.date)==m),top=Object.entries(by).sort((a,b)=>b[1]-a[1])[0];if(top&&ms>0&&Object.keys(by).length>1&&top[1]/ms>=.4)A.push(['w',`You are spending the most on ${top[0]}: ${Math.round(top[1]/ms*100)}% of this month’s spending.`]);
+const lm=spent(null,pmo());if(lm>0&&ms>lm*1.2)A.push(['w',`Spending is up ${Math.round((ms/lm-1)*100)}% compared with last month.`]);
+if(S.tx.length){const last=[...S.tx].sort((a,b)=>b.date.localeCompare(a.date))[0].date,d=Math.floor((Date.now()-new Date(last))/864e5);if(d>=3)A.push(['',`Reminder: nothing recorded for ${d} days. Add your recent expenses.`])}
+if(avail()<0)A.push(['e','Your available balance is negative. Check your entries.']);return A}
+function alertBox(){const A=alerts();return `<div class='c'><h3>🔔 Alerts &amp; reminders${A.length?` <span class='badge'>${A.length}</span>`:''}</h3>${A.length?A.map(a=>`<div class='msg ${a[0]}'>${esc(a[1])}</div>`).join(''):`<div class='note'>All good. No overspending alerts.</div>`}</div>`}
+function pieCard(){const L=mons('');return `<div class='c'><h3>This month’s spending by category</h3>${pie(byCat(t=>t.type=='expense'&&mo(t.date)==curMo()))}</div><div class='c'><h3>Income and expense trend</h3>${L.length?line(L,[{n:'Income',c:'#12a594',v:ms2(L,'income')},{n:'Expenses',c:'#e0536a',v:ms2(L,'expense')}]):`<div class='note'>Add transactions to see the trend.</div>`}</div>`}
+let an={p:'month',t:'expense',c:''};
+function analytics(){const m=curMo(),pm=pmo(),by=byCat(t=>t.type==an.t&&(an.p=='all'||(an.p=='month'&&mo(t.date)==m)||(an.p=='last'&&mo(t.date)==pm)));const L=mons(an.c),wk=[3,2,1,0].map(i=>{const e=Date.now()-i*7*864e5,s=e-7*864e5;return [i?i+'w ago':'This week',sum(S.tx.filter(t=>t.type=='expense'&&new Date(t.date)>s&&new Date(t.date)<=e+864e5))]}),wm=Math.max(1,...wk.map(x=>x[1]));
+return `<h2>Analytics</h2><p class='sub'>Charts update from your saved transactions.</p><div class='c'><div class='f'><select onchange='an.p=this.value;render()' aria-label='Period'><option value='month' ${an.p=='month'?'selected':''}>This month</option><option value='last' ${an.p=='last'?'selected':''}>Last month</option><option value='all' ${an.p=='all'?'selected':''}>All time</option></select><select onchange='an.t=this.value;render()' aria-label='Type'><option value='expense' ${an.t=='expense'?'selected':''}>Expenses</option><option value='income' ${an.t=='income'?'selected':''}>Income</option></select><select onchange='an.c=this.value;render()' aria-label='Trend category'><option value=''>Trend: all categories</option>${catOpts(an.c)}</select></div></div>
+<div class='c'><h3>${an.t=='expense'?'Expenses':'Income'} by category</h3>${pie(by)}</div>
+<div class='c'><h3>Monthly trend${an.c?' · '+esc(an.c):''}</h3>${L.length?line(L,[{n:'Income',c:'#12a594',v:ms2(L,'income',an.c)},{n:'Expenses',c:'#e0536a',v:ms2(L,'expense',an.c)}]):`<div class='note'>No data yet.</div>`}</div>
+<div class='c'><h3>Weekly expenses</h3><div class='cols'>${wk.map(x=>`<div><span><b style='height:${x[1]/wm*100}%;background:var(--nv)' title='${R(x[1])}'></b></span>${x[0]}<br>${R(x[1])}</div>`).join('')}</div></div>
+<div class='c'><h3>Budget utilisation</h3>${Object.keys(S.budgets).length?Object.entries(S.budgets).map(([c,b])=>{const s=spent(c,m),p=s/b*100;return `<div class='row'><span>${esc(c)}</span><span>${Math.round(p)}% · ${lvl(p)}</span></div>${pb(p)}`}).join(''):`<div class='note'>Set category budgets to see this.</div>`}</div>`}
+const fb=(l,v)=>`<div class='fb'>${l}<b>${R(v)}</b></div>`;
+function catTrend(){const L=mons(''),by=byCat(t=>t.type=='expense'),top=Object.entries(by).sort((a,b)=>b[1]-a[1]).slice(0,4);return `<div class='c'><h3>Income and expense trend</h3>${L.length?line(L,[{n:'Income',c:'#12a594',v:ms2(L,'income')},{n:'Expenses',c:'#e0536a',v:ms2(L,'expense')}]):`<div class='note'>Add transactions to see the trend.</div>`}</div>
+<div class='c'><h3>Money flow</h3><div class='flow'>${fb('Income',inc())}<span class='fa'>→</span><div class='fc'>${fb('Spent',exp())}${fb('Emergency Fund',efBal())}${fb('Savings goals',gSaved())}${fb('Available',avail())}</div></div>${top.length?`<div class='flow'>${fb('All expenses',exp())}<span class='fa'>→</span><div class='fc'>${top.map(x=>fb(esc(x[0]),x[1])).join('')}</div></div>`:''}</div>
+<div class='c'><h3>Spending by category</h3>${pie(by)}</div>`}
+let st={f:'',t:''};
+function stRows(){const f=st.f||'0000-00-00',t=st.t||'9999-99-99';return [...S.tx].sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id).filter(x=>x.date>=f&&x.date<=t)}
+const sg=x=>x.type=='income'?x.amount:-x.amount;
+function statement(){const f=st.f||'0000-00-00',open=S.tx.filter(x=>x.date<f).reduce((b,x)=>b+sg(x),0),rows=stRows(),dr=sum(rows.filter(x=>x.type=='expense')),cr=sum(rows.filter(x=>x.type=='income'));let bal=open;
+return `<h2>Statement</h2><p class='sub'>Income and expenses with a running balance. Emergency Fund and goal transfers are not included.</p>${notice()}<div class='c'><div class='f'><label class='note'>From <input type='date' value='${st.f}' onchange='st.f=this.value;render()'></label><label class='note'>To <input type='date' value='${st.t}' onchange='st.t=this.value;render()'></label><button onclick='dlSt()'>Download statement (CSV)</button></div></div>
+<div class='g'><div class='c'><div class='k'>Opening balance</div><div class='v'>${R(open)}</div></div><div class='c'><div class='k'>Credits</div><div class='v pos'>${R(cr)}</div></div><div class='c'><div class='k'>Debits</div><div class='v neg'>${R(dr)}</div></div><div class='c'><div class='k'>Closing balance</div><div class='v'>${R(open+cr-dr)}</div></div></div>
+<div class='c'>${rows.length?`<div class='tw'><table><tr><th>Date</th><th>Description</th><th>Category</th><th>Debit</th><th>Credit</th><th>Balance</th></tr>${rows.map(x=>{bal+=sg(x);return `<tr><td>${x.date}</td><td>${esc(x.desc)}</td><td>${esc(x.cat)}</td><td>${x.type=='expense'?R(x.amount):''}</td><td>${x.type=='income'?R(x.amount):''}</td><td>${R(bal)}</td></tr>`}).join('')}</table></div>`:`<div class='note'>No transactions in this period.</div>`}</div>`}
+function dlSt(){const f=st.f||'0000-00-00';let bal=S.tx.filter(x=>x.date<f).reduce((b,x)=>b+sg(x),0);const o=[['date','description','category','debit','credit','balance'],['','Opening balance','','','',bal]];stRows().forEach(x=>{bal+=sg(x);o.push([x.date,q2(x.desc),q2(x.cat),x.type=='expense'?x.amount:'',x.type=='income'?x.amount:'',bal])});dl('studentspend-statement.csv',o.map(r=>r.join(',')).join('\n'))}
+Object.assign(HI,{'Analytics':'विश्लेषण','Statement':'स्टेटमेंट','Recently deleted':'हाल में हटाए गए','Profile':'प्रोफ़ाइल','Restore':'पुनः प्राप्त करें','Save profile':'प्रोफ़ाइल सहेजें'});
+const LINK='https://claude.ai/artifact/8jYQVEAdBt54psfiC9FQut';
+function copyLink(){const i=$('lk');i.select();let ok=false;try{if(navigator.clipboard){navigator.clipboard.writeText(LINK);ok=true}else ok=document.execCommand('copy')}catch(e){try{ok=document.execCommand('copy')}catch(x){}}$('cm').textContent=ok?'Link copied.':'Press Ctrl+C to copy the selected link.'}
+function syncNow(){pushDb();$('cm2').textContent=dbDoc?'Sync requested.':'Sync is not available in this view.'}
+function sharePage(){const p=S.profile||{},msg=`Hi${p.parent?' '+p.parent:''}, here is my StudentSpend money tracker. You can view my spending and savings here: ${LINK}`;
+return `<h2>Share with parent</h2><p class='sub'>Let a parent view your tracker. They can look but not change anything.</p>${notice()}
+<div class='c'><h3>How it works</h3><ol><li>In claude.ai, open the <b>Share</b> option for this page and add your parent’s email as a viewer. This page cannot open that menu for you.</li><li>Send them the link below.</li><li>They open it while signed in to claude.ai and see your transactions, budgets, savings and Emergency Fund in read-only mode.</li></ol></div>
+<div class='c'><h3>Link</h3><div class='f'><input id='lk' readonly value="${LINK}" aria-label='Page link'><button onclick='copyLink()'>Copy link</button></div><span id='cm' class='note'></span>
+<div class='f' style='margin-top:10px'><a href='https://wa.me/?text=${encodeURIComponent(msg)}' target='_blank' rel='noopener'><button type='button'>Send on WhatsApp</button></a><a href='mailto:${esc(p.parentEmail||'')}?subject=${encodeURIComponent('My StudentSpend tracker')}&body=${encodeURIComponent(msg)}'><button type='button' class='o'>Send by email</button></a></div></div>
+<div class='c'><h3>Sync</h3><p class='note'>${dbDoc?'✅ Sync is on. Your data updates for parents each time you save.':'Sync is not available in this view, so parents would see no data.'}</p><button class='o' onclick='syncNow()'>Sync now</button> <span id='cm2' class='note'></span><p class='note'>Anyone you share with can see all your financial data. To stop, remove them in the Share menu.</p></div>`}
+let cv={p:'month',c:''};
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+function periodRange(p,off){const d=new Date();if(p=='week'){const day=(d.getDay()+6)%7,s=new Date(d.getFullYear(),d.getMonth(),d.getDate()-day-off*7),e=new Date(s.getFullYear(),s.getMonth(),s.getDate()+6);return [iso(s),iso(e)]}const s=new Date(d.getFullYear(),d.getMonth()-off,1),e=new Date(d.getFullYear(),d.getMonth()-off+1,0);return [iso(s),iso(e)]}
+const inR=(r,c)=>sum(S.tx.filter(t=>t.type=='expense'&&t.date>=r[0]&&t.date<=r[1]&&(!c||t.cat==c)));
+function catPeriod(){const w=cv.p=='week',cur=periodRange(cv.p,0),prev=periodRange(cv.p,1),by=byCat(t=>t.type=='expense'&&t.date>=cur[0]&&t.date<=cur[1]),pv=byCat(t=>t.type=='expense'&&t.date>=prev[0]&&t.date<=prev[1]);
+const names=[...new Set([...Object.keys(by),...Object.keys(pv)])].sort((a,b)=>(by[b]||0)-(by[a]||0)),bars=[5,4,3,2,1,0].map(o=>{const r=periodRange(cv.p,o);return [w?r[0].slice(5):r[0].slice(2,7),inR(r,cv.c)]}),mx=Math.max(1,...bars.map(x=>x[1]));
+return `<div class='c'><h3>Expenses by category</h3><div class='f'><button class='o ${w?'sel':''}' onclick="cv.p='week';render()">Weekly</button><button class='o ${!w?'sel':''}' onclick="cv.p='month';render()">Monthly</button></div><p class='note'>${w?'This week':'This month'}: ${cur[0]} to ${cur[1]}</p>${names.length?`<div class='tw'><table><tr><th>Category</th><th>${w?'This week':'This month'}</th><th>${w?'Last week':'Last month'}</th><th>Change</th></tr>${names.map(n=>{const a=by[n]||0,b=pv[n]||0;return `<tr><td>${esc(n)}</td><td>${R(a)}</td><td>${R(b)}</td><td>${b?(a>=b?'+':'−')+Math.round(Math.abs(a-b)/b*100)+'%':'new'}</td></tr>`}).join('')}</table></div>`:`<div class='note'>No expenses in this period.</div>`}</div>
+<div class='c'><h3>${w?'Weekly':'Monthly'} expense trend</h3><div class='f'><select onchange='cv.c=this.value;render()' aria-label='Category'><option value=''>All categories</option>${catOpts(cv.c)}</select></div><div class='cols'>${bars.map(x=>`<div><span><b style='height:${x[1]/mx*100}%;background:var(--nv)' title='${R(x[1])}'></b></span>${x[0]}<br>${R(x[1])}</div>`).join('')}</div></div>
+<div class='c'><h3>${w?'Weekly':'Monthly'} split by category</h3>${pie(by)}</div>`}
+function catPeriod(){const w=cv.p=='week',cur=periodRange(cv.p,0),prev=periodRange(cv.p,1),by=byCat(t=>t.type=='expense'&&t.date>=cur[0]&&t.date<=cur[1]),pv=byCat(t=>t.type=='expense'&&t.date>=prev[0]&&t.date<=prev[1]),names=[...new Set([...Object.keys(by),...Object.keys(pv)])].sort((a,b)=>(by[b]||0)-(by[a]||0));
+return `<div class='c'><h3>Expenses by category</h3><div class='f'><button class='o ${w?'sel':''}' onclick="cv.p='week';render()">Weekly</button><button class='o ${!w?'sel':''}' onclick="cv.p='month';render()">Monthly</button></div><p class='note'>${w?'This week':'This month'}: ${cur[0]} to ${cur[1]}</p>${names.length?`<div class='tw'><table><tr><th>Category</th><th>${w?'This week':'This month'}</th><th>${w?'Last week':'Last month'}</th><th>Change</th></tr>${names.map(n=>{const a=by[n]||0,b=pv[n]||0;return `<tr><td>${esc(n)}</td><td>${R(a)}</td><td>${R(b)}</td><td>${b?(a>=b?'+':'−')+Math.round(Math.abs(a-b)/b*100)+'%':'new'}</td></tr>`}).join('')}</table></div>`:`<div class='note'>No expenses in this period.</div>`}</div>`}
+function shareMsg(){const p=S.profile||{};return `Hi${p.parent?' '+p.parent:''}, here is my StudentSpend money tracker where you can view my spending and savings: ${LINK}`}
+function copyText(t,el){const ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}ta.remove();const bad='Copy was blocked here. Select the text above and copy it yourself.';if(!ok&&navigator.clipboard){navigator.clipboard.writeText(t).then(()=>{$(el).textContent='Copied.'},()=>{$(el).textContent=bad});return}$(el).textContent=ok?'Copied.':bad}
+function copyLink(){copyText(LINK,'cm')}
+function copyMsg(){copyText(shareMsg(),'cm')}
+async function nativeShare(){try{if(navigator.share){await navigator.share({title:'My StudentSpend tracker',text:shareMsg()});return}}catch(e){if(e&&e.name=='AbortError')return}copyText(shareMsg(),'cm')}
+function sharePage(){const p=S.profile||{},m=shareMsg();
+return `<h2>Share with parent</h2><p class='sub'>Let a parent view your tracker. They can look but not change anything.</p>${notice()}
+<div class='msg w'><b>Important:</b> this link only opens for your parent after you add them in claude.ai’s <b>Share</b> option for this page (invite their email as a viewer). Until then it works only for you. This page cannot open that menu for you.</div>
+<div class='c'><h3>Link</h3><input id='lk' readonly value="${LINK}" aria-label='Page link' style='width:100%' onfocus='this.select()'><h3 style='margin-top:14px'>Message to send</h3><textarea id='mg' readonly rows='3' style='width:100%' aria-label='Message' onfocus='this.select()'>${esc(m)}</textarea>
+<div class='f' style='margin-top:10px'><button onclick='copyLink()'>Copy link</button><button class='o' onclick='copyMsg()'>Copy message</button><button class='o' onclick='nativeShare()'>Share…</button></div><span id='cm' class='note'></span>
+<div class='f' style='margin-top:10px'><a href='https://wa.me/?text=${encodeURIComponent(m)}' target='_blank' rel='noopener'><button type='button' class='o'>WhatsApp</button></a><a href='mailto:${esc(p.parentEmail||'')}?subject=${encodeURIComponent('My StudentSpend tracker')}&body=${encodeURIComponent(m)}'><button type='button' class='o'>Email</button></a></div><p class='note'>If WhatsApp or Email does nothing, use Copy message and paste it yourself.</p></div>
+<div class='c'><h3>Sync</h3><p class='note'>${dbDoc?'✅ Sync is on. Your data updates for parents each time you save.':'Sync is not available in this view, so parents would see no data.'}</p><button class='o' onclick='syncNow()'>Sync now</button> <span id='cm2' class='note'></span><p class='note'>Anyone you share with can see all your financial data. To stop, remove them in the Share menu.</p></div>`}
+function shareMsg(n){return `Hi${n?' '+n:''}, here is my StudentSpend money tracker where you can view my spending and savings: ${LINK}`}
+function addParent(){const n=$('an').value.trim(),e=$('ae').value.trim(),ph=$('ap').value.replace(/\D/g,'');if(!n||(!e&&!ph)){flash=['e','Enter the parent\u2019s name and an email or phone number.'];return render()}if(e&&!/^\S+@\S+\.\S+$/.test(e)){flash=['e','Enter a valid email address.'];return render()}S.parents=S.parents||[];if(e&&S.parents.some(x=>(x.email||'').toLowerCase()==e.toLowerCase())){flash=['e','That email is already added.'];return render()}S.parents.push({id:Date.now(),name:n,email:e,phone:ph});save();flash=['',n+' added. Now add their email in claude.ai\u2019s Share option so the link opens for them.'];render()}
+function delParent(id){const p=(S.parents||[]).find(x=>x.id==id);if(!p)return;cfm(`Remove ${p.name} from this list? This does not remove their access in claude.ai\u2019s Share option.`,()=>{S.parents=S.parents.filter(x=>x.id!=id);save();render()})}
+function sharePage(){const P=S.parents||[];
+return `<h2>Share with parent</h2><p class='sub'>Add your parents here, then send them the link. They can view your tracker but not change anything.</p>${notice()}
+<div class='msg w'><b>Important:</b> adding a parent here saves their contact details and prepares your message. It does not give them access. To let the link open for them, also invite their email as a viewer in claude.ai\u2019s <b>Share</b> option for this page. This page cannot open that menu for you.</div>
+<div class='c'><h3>Add parent</h3><div class='f'><input id='an' placeholder='Parent name' aria-label='Parent name'><input id='ae' type='email' placeholder='Email' aria-label='Parent email'><input id='ap' placeholder='Phone with country code, e.g. 91XXXXXXXXXX' aria-label='Parent phone'></div><button onclick='addParent()'>Add parent</button></div>
+<div class='c'><h3>Your parents</h3>${P.length?P.map(p=>`<div class='f' style='align-items:center;border-bottom:1px solid var(--bd);padding-bottom:10px'><span><b>${esc(p.name)}</b><br><span class='note'>${esc(p.email||'')} ${p.phone?'\u00b7 +'+esc(p.phone):''}</span></span>${p.email?`<a href='mailto:${esc(p.email)}?subject=${encodeURIComponent('My StudentSpend tracker')}&body=${encodeURIComponent(shareMsg(p.name))}'><button type='button' class='o'>Email</button></a>`:''}${p.phone?`<a href='https://wa.me/${esc(p.phone)}?text=${encodeURIComponent(shareMsg(p.name))}' target='_blank' rel='noopener'><button type='button' class='o'>WhatsApp</button></a>`:''}<button class='s' onclick='delParent(${p.id})'>Remove</button></div>`).join(''):`<div class='note'>No parents added yet.</div>`}<p class='note'>If Email or WhatsApp does nothing, use Copy message below and paste it yourself.</p></div>
+<div class='c'><h3>Link and message</h3><input id='lk' readonly value="${LINK}" aria-label='Page link' style='width:100%' onfocus='this.select()'><textarea id='mg' readonly rows='3' style='width:100%;margin-top:10px' aria-label='Message' onfocus='this.select()'>${esc(shareMsg())}</textarea><div class='f' style='margin-top:10px'><button onclick='copyLink()'>Copy link</button><button class='o' onclick='copyMsg()'>Copy message</button><button class='o' onclick='nativeShare()'>Share\u2026</button></div><span id='cm' class='note'></span></div>
+<div class='c'><h3>Sync</h3><p class='note'>${dbDoc?'\u2705 Sync is on. Your data updates for parents each time you save.':'Sync is not available in this view, so parents would see no data.'}</p><button class='o' onclick='syncNow()'>Sync now</button> <span id='cm2' class='note'></span><p class='note'>Anyone you share with can see all your financial data. To stop, remove them in the Share menu.</p></div>`}
+const fd=d=>d?new Date(d+'T00:00:00').toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}):'';
+st.k='all';
+function setRange(k){const d=new Date();if(k=='month'){st.f=iso(new Date(d.getFullYear(),d.getMonth(),1));st.t=iso(d)}else if(k=='last'){st.f=iso(new Date(d.getFullYear(),d.getMonth()-1,1));st.t=iso(new Date(d.getFullYear(),d.getMonth(),0))}else{st.f='';st.t=''}render()}
+function statement(){const f=st.f||'0000-00-00',all=stRows(),open=S.tx.filter(x=>x.date<f).reduce((b,x)=>b+sg(x),0),dr=sum(all.filter(x=>x.type=='expense')),cr=sum(all.filter(x=>x.type=='income')),k=st.k||'all';let bal=open;
+const rows=all.map(x=>{bal+=sg(x);return Object.assign({},x,{bal})}).filter(x=>k=='all'||(k=='credit'?x.type=='income':x.type=='expense')),dts=S.tx.map(x=>x.date).sort(),from=st.f||dts[0]||'',to=st.t||dts[dts.length-1]||'';
+return `<h2>Statement</h2><p class='sub'>Period: <b>${from?fd(from)+' to '+fd(to):'no transactions yet'}</b>. Emergency Fund and goal transfers are not included.</p>${notice()}
+<div class='c'><div class='f'><label class='note'>From <input type='date' value='${from}' onchange='st.f=this.value;render()'></label><label class='note'>To <input type='date' value='${to}' onchange='st.t=this.value;render()'></label></div>
+<div class='f'><button class='o' onclick="setRange('month')">This month</button><button class='o' onclick="setRange('last')">Last month</button><button class='o' onclick="setRange('all')">All time</button></div>
+<div class='f'>${[['all','All'],['credit','Credit'],['debit','Debit']].map(x=>`<button class='o ${k==x[0]?'sel':''}' onclick="st.k='${x[0]}';render()">${x[1]}</button>`).join('')}<button onclick='dlSt()'>Download statement (CSV)</button></div></div>
+<div class='g'><div class='c'><div class='k'>Opening balance</div><div class='v'>${R(open)}</div></div><div class='c'><div class='k'>Credits</div><div class='v pos'>${R(cr)}</div></div><div class='c'><div class='k'>Debits</div><div class='v neg'>${R(dr)}</div></div><div class='c'><div class='k'>Closing balance</div><div class='v'>${R(open+cr-dr)}</div></div></div>
+<div class='c'>${rows.length?`<div class='tw'><table><tr><th>Date</th><th>Description</th><th>Category</th><th>Debit</th><th>Credit</th><th>Balance</th></tr>${rows.map(x=>`<tr><td>${fd(x.date)}</td><td>${esc(x.desc)}</td><td>${esc(x.cat)}</td><td>${x.type=='expense'?R(x.amount):''}</td><td>${x.type=='income'?R(x.amount):''}</td><td>${R(x.bal)}</td></tr>`).join('')}</table></div>`:`<div class='note'>No ${k=='all'?'':k+' '}transactions in this period.</div>`}</div>`}
+let sh={who:''};
+const curName=()=>{const p=(S.parents||[]).find(x=>x.id==sh.who);return p?p.name:''};
+function copyMsg(){copyText(shareMsg(curName()),'cm')}
+async function nativeShare(){try{if(navigator.share){await navigator.share({title:'My StudentSpend tracker',text:shareMsg(curName())});return}}catch(e){if(e&&e.name=='AbortError')return}copyMsg()}
+function openOut(u){const w=window.open(u,'_blank');if(!w){copyMsg();setTimeout(()=>{const c=$('cm');if(c)c.textContent='Your browser blocked opening the app, so the message was copied. Paste it yourself.'},50)}}
+function sendMail(){openOut('mailto:'+encodeURIComponent($('se').value.trim())+'?subject='+encodeURIComponent('My StudentSpend tracker')+'&body='+encodeURIComponent(shareMsg(curName())))}
+function sendWa(){const ph=$('sp').value.replace(/\D/g,'');openOut('https://wa.me/'+ph+'?text='+encodeURIComponent(shareMsg(curName())))}
+function sharePage(){const P=S.parents||[],cur=P.find(p=>p.id==sh.who);
+return `<h2>Share</h2><p class='sub'>Share your tracker with anyone, including your parents. People you share with can view it but not change anything.</p>${notice()}
+<div class='msg w'><b>Important:</b> the buttons below only send a message with the link. For the link to open for someone, also invite their email as a viewer in claude.ai\u2019s <b>Share</b> option for this page. This page cannot open that menu for you.</div>
+<div class='c'><h3>Share with</h3><select onchange='sh.who=this.value;render()' aria-label='Share with'><option value=''>Anyone</option>${P.map(p=>`<option value='${p.id}' ${p.id==sh.who?'selected':''}>${esc(p.name)} (parent)</option>`).join('')}</select>
+<div class='f' style='margin-top:10px'><input id='se' type='email' value="${esc(cur?cur.email||'':'')}" placeholder='Email (optional)' aria-label='Email'><input id='sp' value="${esc(cur?cur.phone||'':'')}" placeholder='Phone with country code (optional)' aria-label='Phone'></div>
+<div class='f'><button onclick='sendMail()'>Email</button><button class='o' onclick='sendWa()'>WhatsApp</button><button class='o' onclick='copyMsg()'>Copy message</button><button class='o' onclick='nativeShare()'>Share\u2026</button></div><span id='cm' class='note'></span></div>
+<div class='c'><h3>Link</h3><input id='lk' readonly value="${LINK}" aria-label='Page link' style='width:100%' onfocus='this.select()'><div class='f' style='margin-top:10px'><button onclick='copyLink()'>Copy link</button></div></div>
+<div class='c'><h3>Saved parents</h3><p class='note'>Save a parent once so they appear in the Share with list.</p><div class='f'><input id='an' placeholder='Parent name' aria-label='Parent name'><input id='ae' type='email' placeholder='Email' aria-label='Parent email'><input id='ap' placeholder='Phone with country code' aria-label='Parent phone'></div><button onclick='addParent()'>Save parent</button>${P.map(p=>`<div class='row'><span><b>${esc(p.name)}</b> <span class='note'>${esc(p.email||'')} ${p.phone?'\u00b7 +'+esc(p.phone):''}</span></span><button class='s' onclick='delParent(${p.id})'>Remove</button></div>`).join('')}</div>
+<div class='c'><h3>Sync</h3><p class='note'>${dbDoc?'\u2705 Sync is on. Your data updates for viewers each time you save.':'Sync is not available in this view, so viewers would see no data.'}</p><button class='o' onclick='syncNow()'>Sync now</button> <span id='cm2' class='note'></span><p class='note'>Anyone you share with can see all your financial data. To stop, remove them in claude.ai\u2019s Share menu.</p></div>`}
+const USERS_K='ss_users';
+const users=()=>{try{return JSON.parse(localStorage.getItem(USERS_K)||'[]')}catch(e){return[]}};
+const saveUsers=a=>{try{localStorage.setItem(USERS_K,JSON.stringify(a))}catch(e){}};
+const DEFS=()=>({tx:[],cats:[],budgets:{},overall:0,hard:false,ef:[],efTarget:0,goals:[],imports:[]});
+const b64=b=>btoa(String.fromCharCode(...new Uint8Array(b)));
+const unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function hashPw(pw,salt){const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveBits']);return b64(await crypto.subtle.deriveBits({name:'PBKDF2',salt,iterations:150000,hash:'SHA-256'},k,256))}
+function normId(raw){const s=String(raw||'').trim();if(/^\S+@\S+\.\S+$/.test(s))return{t:'email',v:s.toLowerCase()};const d=s.replace(/[\s()-]/g,'');if(/^(\+91|91|0)?[6-9]\d{9}$/.test(d))return{t:'phone',v:d.slice(-10)};if(/^[A-Za-z0-9_.]{3,20}$/.test(s))return{t:'id',v:s.toLowerCase()};return null}
+let au={tab:'in',msg:'',fails:0,lock:0,id:'',name:''};
+function authErr(m){au.msg=m;authView()}
+function authView(){applyTheme();document.body.classList.add('na');let a=document.getElementById('auth');if(!a){a=document.createElement('div');a.id='auth';document.body.appendChild(a)}
+const up=au.tab=='up',legacy=!users().length&&(()=>{try{return !!localStorage.getItem('ss1')}catch(e){return false}})();
+a.innerHTML=`<div class='ab'><h1>\u20b9 StudentSpend</h1><p class='note'>${up?'Create your account':'Sign in to your tracker'}</p>
+<div class='f'><button class='o ${!up?'sel':''}' onclick="au.tab='in';au.msg='';authView()">Sign in</button><button class='o ${up?'sel':''}' onclick="au.tab='up';au.msg='';authView()">Create account</button></div>
+${au.msg?`<div class='msg e' role='alert'>${esc(au.msg)}</div>`:''}
+${up?`<input id='un' type='text' autocomplete='name' placeholder='Your name' aria-label='Name' value="${esc(au.name||'')}">`:''}
+<input id='ui' type='text' autocomplete='username' placeholder='Email, mobile number or user ID' aria-label='Email, mobile number or user ID' value="${esc(au.id||'')}">
+<input id='up' type='password' autocomplete='${up?'new-password':'current-password'}' placeholder='Password' aria-label='Password' onkeydown="if(event.key=='Enter'){${up?'':'doSignIn()'}}">
+${up?`<input id='uc' type='password' autocomplete='new-password' placeholder='Confirm password' aria-label='Confirm password' onkeydown="if(event.key=='Enter'){doSignUp()}"><p class='note'>At least 8 characters, with letters and numbers.</p>`:''}
+<label class='note'><input type='checkbox' onchange="document.getElementById('up').type=this.checked?'text':'password'"> Show password</label><br>
+<label class='note'><input id='uk' type='checkbox'> Keep me signed in on this device</label>
+${up&&legacy?`<br><label class='note'><input id='um' type='checkbox' checked> Move the data already saved in this browser into this account</label>`:''}
+<p><button class='big' onclick='${up?'doSignUp()':'doSignIn()'}'>${up?'Create account':'Sign in'}</button></p>
+${up?'':`<p class='note'><a href='#' onclick='forgot();return false'>Forgot password?</a></p>`}
+<p class='note'>Accounts and data are stored only in this browser on this device. There is no email or SMS verification and no password recovery.</p></div>`;
+const f=document.getElementById(up?'un':'ui');if(f&&!au.msg)f.focus()}
+async function doSignUp(){const name=$('un').value.trim(),raw=$('ui').value,pw=$('up').value,pc=$('uc').value;au.id=raw;au.name=name;
+if(!window.crypto||!crypto.subtle)return authErr('This browser cannot create secure passwords. Open the page in a modern browser over https.');
+if(!name)return authErr('Enter your name.');const id=normId(raw);if(!id)return authErr('Enter a valid email, a 10-digit Indian mobile number, or a user ID (3 to 20 letters, numbers, _ or .).');
+if(pw.length<8||!/[A-Za-z]/.test(pw)||!/\d/.test(pw))return authErr('Password must be at least 8 characters with letters and numbers.');
+if(pw!==pc)return authErr('The passwords do not match.');
+const us=users();if(us.some(u=>u.idv==id.v))return authErr('An account with this email, number or ID already exists on this device. Sign in instead.');
+const mv=$('um')&&$('um').checked,keep=$('uk').checked,salt=crypto.getRandomValues(new Uint8Array(16)),u={id:'u'+Date.now().toString(36),name,idt:id.t,idv:id.v,salt:b64(salt),hash:await hashPw(pw,salt),at:Date.now()};
+us.push(u);saveUsers(us);
+if(mv){try{const old=localStorage.getItem('ss1');if(old){localStorage.setItem('ss1_'+u.id,old);localStorage.removeItem('ss1')}}catch(e){}}
+enter(u,keep)}
+async function doSignIn(){const raw=$('ui').value,pw=$('up').value,keep=$('uk').checked;au.id=raw;if(Date.now()<au.lock)return authErr(`Too many attempts. Try again in ${Math.ceil((au.lock-Date.now())/1000)} seconds.`);
+const id=normId(raw),u=id&&users().find(x=>x.idv==id.v);let ok=false;if(u&&window.crypto&&crypto.subtle)ok=(await hashPw(pw,unb64(u.salt)))===u.hash;
+if(!ok){au.fails++;if(au.fails>=5){au.lock=Date.now()+30000;au.fails=0;return authErr('Too many attempts. Try again in 30 seconds.')}return authErr('Incorrect email, number, user ID or password.')}
+au.fails=0;enter(u,keep)}
+function loadUser(u){USER=u;UK='ss1_'+u.id;let d={};try{d=JSON.parse(localStorage.getItem(UK)||'{}')}catch(e){}S=Object.assign(DEFS(),d);if(!S.profile)S.profile={name:u.name,email:u.idt=='email'?u.idv:''};S.trash=(S.trash||[]).filter(x=>Date.now()-x.at<30*864e5)}
+function enter(u,keep){try{localStorage.removeItem('ss_sess');sessionStorage.removeItem('ss_sess');(keep?localStorage:sessionStorage).setItem('ss_sess',u.id)}catch(e){}loadUser(u);document.body.classList.remove('na');const a=document.getElementById('auth');if(a)a.remove();au.msg='';au.id='';au.name='';flash=null;location.hash='dashboard';render();pushDb()}
+function signOut(){if(RO)return;try{localStorage.removeItem('ss_sess');sessionStorage.removeItem('ss_sess')}catch(e){}USER=null;UK='ss1';S=DEFS();wd=null;imp=null;flash=null;au.tab='in';render()}
+function forgot(){const id=normId($('ui').value),u=id&&users().find(x=>x.idv==id.v);if(!u)return authErr('Enter your email, number or user ID above first.');cfm('This app has no server, so it cannot email or text you a reset link. You can erase this account and all its data on this device, then create it again. Erase it?',()=>{saveUsers(users().filter(x=>x.id!=u.id));try{localStorage.removeItem('ss1_'+u.id)}catch(e){}au.tab='up';au.msg='Account erased. You can create it again.';authView()})}
+function accountCard(){const u=USER;return u?`<div class='c'><h3>Account</h3><p class='note'>Signed in as <b>${esc(u.name)}</b> (${esc(u.idv)}). Accounts on this device: ${users().length}.</p><button class='o' onclick='signOut()'>Sign out</button></div>`:''}
+const ini=()=>(((S.profile&&S.profile.name)||(USER&&USER.name)||'S').trim().charAt(0)||'S').toUpperCase();
+function who(){const p=S.profile||{},e=$('who'),a=$('av');if(e)e.textContent=(RO?'👪 Parent view (read only)'+(p.name?' · '+p.name:''):(p.name?'Hi, '+p.name:'Profile not set'));if(a)a.textContent=RO?'👪':ini()}
+function goAI(){location.hash='insights';render();setTimeout(()=>{const q=$('aq');if(q)q.focus()},60)}
+function showProfile(){if(document.querySelector('.mo'))return;const p=S.profile||{},u=USER||{};const d=document.createElement('div');d.className='mo';d.onclick=e=>{if(e.target==d)d.remove()};
+d.innerHTML=`<div class='mb' role='dialog' aria-modal='true' aria-label='Your profile'><div style='display:flex;gap:14px;align-items:center;margin-bottom:12px'><div class='av big2'>${RO?'👪':ini()}</div><div><b style='font-size:18px'>${esc(p.name||u.name||'Student')}</b><br><span class='note'>${esc(u.idv||(RO?'Parent view':''))}</span></div></div><div class='note'>College: ${esc(p.college||'Not set')}<br>Email: ${esc(p.email||'Not set')}<br>Parent: ${esc(p.parent||'Not set')}</div><div class='f' style='margin-top:14px'>${RO?'':`<button id='pe1'>Edit profile</button><button class='o' id='pe2'>Sign out</button>`}<button class='o' id='pe3'>Close</button></div></div>`;document.body.appendChild(d);
+if(!RO){$('pe1').onclick=()=>{d.remove();location.hash='settings'};$('pe2').onclick=()=>{d.remove();signOut()}}$('pe3').onclick=()=>d.remove()}
+function doSignOut(){try{localStorage.removeItem('ss_sess');sessionStorage.removeItem('ss_sess')}catch(e){}USER=null;UK='ss1';S=DEFS();wd=null;imp=null;flash=null;au.tab='in';render()}
+function signOut(){if(RO)return;cfm('Sign out of StudentSpend? You can sign in again with your password.',doSignOut)}
+async function aiCat(){const d=$('de').value.trim(),sg=$('sg');if(!d){sg.textContent='Type a description first.';return}let pick=suggest(d),src='keywords';sg.textContent='Thinking…';
+const sample=window.claude?await window.claude.use('sample'):null;
+if(sample){try{const r=await sample(`Pick the single best expense category for this transaction description from this list: ${allCats().join(', ')}. Reply with only the category name.\nDescription: ${d}`,{cache:false,modelTier:'quick'});const t=(r.text||'').trim().replace(/[.\s]+$/,''),m=allCats().find(c=>c.toLowerCase()==t.toLowerCase());if(m){pick=m;src='AI'}}catch(e){}}
+const el=$('ca');if(el)el.value=pick;sg.textContent='Suggested: '+pick+' ('+src+'). You can change it.'}
+function line(L,ser,fmt){fmt=fmt||(l=>l.slice(2));const W=560,H=200,p=30,mx=Math.max(1,...ser.flatMap(s=>s.v)),X=i=>p+(L.length>1?i*(W-2*p)/(L.length-1):(W-2*p)/2),Y=v=>H-p-v/mx*(H-2*p),step=Math.ceil(L.length/8),r=L.length>14?2.5:4.5;
+return `<svg viewBox='0 0 ${W} ${H}' style='width:100%;height:auto' role='img' aria-label='Income and expense trend'>${[0,.5,1].map(f=>`<line x1='${p}' y1='${Y(mx*f)}' x2='${W-p}' y2='${Y(mx*f)}' stroke='#9aa8c6' stroke-opacity='.35'/><text x='${p-4}' y='${Y(mx*f)+4}' font-size='10' text-anchor='end' fill='#9aa8c6'>${Math.round(mx*f)}</text>`).join('')}${ser.map(s=>`<polyline fill='none' stroke='${s.c}' stroke-width='3' stroke-linejoin='round' points='${s.v.map((v,i)=>X(i)+','+Y(v)).join(' ')}'/>${s.v.map((v,i)=>`<circle cx='${X(i)}' cy='${Y(v)}' r='${r}' fill='${s.c}'><title>${s.n} ${L[i]}: ${R(v)}</title></circle>`).join('')}`).join('')}${L.map((l,i)=>i%step==0||i==L.length-1?`<text x='${X(i)}' y='${H-8}' font-size='10' text-anchor='middle' fill='#9aa8c6'>${fmt(l)}</text>`:'').join('')}</svg><div class='note'><span style='color:#12a594'>\u25cf</span> Income <span style='color:#e0536a'>\u25cf</span> Expenses (amounts in \u20b9)</div>`}
+function trendData(){const ds=[...new Set(S.tx.map(t=>t.date))].sort();if(!ds.length)return null;const ms=[...new Set(S.tx.map(t=>mo(t.date)))].sort();
+if(ms.length>=3){const L=ms.slice(-6);return{L,inc:ms2(L,'income'),exp:ms2(L,'expense'),fmt:l=>l.slice(2),unit:'monthly'}}
+const now=Date.now(),s=new Date(Math.max(Math.min(new Date(ds[0]+'T00:00:00').getTime(),now-6*864e5),now-61*864e5)),days=[];for(let d=new Date(s);d<=new Date(now)&&days.length<64;d.setDate(d.getDate()+1))days.push(iso(d));
+const on=(ty,d)=>sum(S.tx.filter(t=>t.type==ty&&t.date==d));return{L:days,inc:days.map(d=>on('income',d)),exp:days.map(d=>on('expense',d)),fmt:l=>l.slice(5),unit:'daily'}}
+function catTrend(){const td=trendData(),by=byCat(t=>t.type=='expense'),top=Object.entries(by).sort((a,b)=>b[1]-a[1]).slice(0,4);
+return `<div class='c'><h3>Income and expense trend${td?' ('+td.unit+')':''}</h3>${td?line(td.L,[{n:'Income',c:'#12a594',v:td.inc},{n:'Expenses',c:'#e0536a',v:td.exp}],td.fmt):`<div class='note'>Add transactions to see the trend.</div>`}</div>
+<div class='c'><h3>Money flow</h3><div class='flow'>${fb('Income',inc())}<span class='fa'>\u2192</span><div class='fc'>${fb('Spent',exp())}${fb('Emergency Fund',efBal())}${fb('Savings goals',gSaved())}${fb('Available',avail())}</div></div>${top.length?`<div class='flow'>${fb('All expenses',exp())}<span class='fa'>\u2192</span><div class='fc'>${top.map(x=>fb(esc(x[0]),x[1])).join('')}</div></div>`:''}</div>
+<div class='c'><h3>Spending by category</h3>${pie(by)}</div>`}
+function localSave(name,data,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type}));a.download=name;document.body.appendChild(a);a.click();a.remove()}
+async function saveOut(name,data,type){const d=window.claude?await window.claude.use('downloads'):null;if(d){await d.save({filename:name,data});return}localSave(name,data,type)}
+async function dl(name,text){try{await saveOut(name,'\ufeff'+text,'text/csv');flash=['','Saved '+name+'.']}catch(e){flash=['e',e&&e.code=='declined'?'Download cancelled.':'The file was not saved.']}render()}
+async function dlSt(){const f=st.f||'0000-00-00';let bal=S.tx.filter(x=>x.date<f).reduce((b,x)=>b+sg(x),0);const open=bal,rows=stRows();
+const aoa=[['Date','Description','Category','Debit (INR)','Credit (INR)','Balance (INR)'],['','Opening balance','','','',open]];rows.forEach(x=>{bal+=sg(x);const[y,m,d]=x.date.split('-').map(Number);aoa.push([new Date(Date.UTC(y,m-1,d,12)),x.desc,x.cat,x.type=='expense'?x.amount:'',x.type=='income'?x.amount:'',bal])});
+let done=false;if(window.XLSX){try{const ws=XLSX.utils.aoa_to_sheet(aoa,{cellDates:true});for(let i=2;i<aoa.length;i++){const c=ws['A'+(i+1)];if(c)c.z='dd mmm yyyy'}for(let i=1;i<aoa.length;i++)['D','E','F'].forEach(L=>{const c=ws[L+(i+1)];if(c&&c.t=='n')c.z='#,##0.00'});ws['!cols']=[{wch:14},{wch:34},{wch:18},{wch:14},{wch:14},{wch:16}];const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Statement');
+await saveOut('studentspend-statement.xlsx',XLSX.write(wb,{bookType:'xlsx',type:'array'}),'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');done=true;flash=['','Statement saved as an Excel file with proper dates.']}catch(e){if(e&&e.code=='declined'){flash=['','Download cancelled.'];return render()}}}
+if(!done){let b=open;const out=[['Date','Description','Category','Debit (INR)','Credit (INR)','Balance (INR)'].join(','),['','Opening balance','','','',open].join(',')];rows.forEach(x=>{b+=sg(x);out.push(['="'+fd(x.date)+'"',q2(x.desc),q2(x.cat),x.type=='expense'?x.amount:'',x.type=='income'?x.amount:'',b].join(','))});try{await saveOut('studentspend-statement.csv','\ufeff'+out.join('\n'),'text/csv');flash=['','Statement saved as CSV.']}catch(e){flash=['e',e&&e.code=='declined'?'Download cancelled.':'The file was not saved.']}}render()}
+const normCode=s=>String(s||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+function genCode(){const A='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',r=crypto.getRandomValues(new Uint8Array(12)),c=[...r].map(x=>A[x%A.length]).join('');return c.slice(0,4)+'-'+c.slice(4,8)+'-'+c.slice(8)}
+async function setCode(u){const code=genCode(),salt=crypto.getRandomValues(new Uint8Array(16));u.rs=b64(salt);u.rh=await hashPw(normCode(code),salt);return code}
+function showCode(code,next){const d=document.createElement('div');d.className='mo';d.innerHTML=`<div class='mb' role='dialog' aria-modal='true'><h3 style='margin-top:0'>Save your recovery code</h3><p class='note'>If you forget your password, this code is the only way to reset it without losing your data. It is shown only once. Write it down or keep a screenshot somewhere safe.</p><div class='fb' style='text-align:center;font-size:20px;letter-spacing:2px;margin-bottom:10px'><b id='rcv'>${code}</b></div><div class='f'><button class='o' id='rcc'>Copy</button><button id='rcd'>I have saved it</button></div><span id='rcm' class='note'></span></div>`;document.body.appendChild(d);$('rcc').onclick=()=>copyText(code,'rcm');$('rcd').onclick=()=>{d.remove();next()}}
+function authView(){applyTheme();document.body.classList.add('na');let a=document.getElementById('auth');if(!a){a=document.createElement('div');a.id='auth';document.body.appendChild(a)}
+const T=au.tab,up=T=='up',rs=T=='reset',legacy=!users().length&&(()=>{try{return !!localStorage.getItem('ss1')}catch(e){return false}})();
+a.innerHTML=`<div class='ab'><h1>\u20b9 StudentSpend</h1><p class='note'>${up?'Create your account':rs?'Reset your password':'Sign in to your tracker'}</p>
+<div class='f'><button class='o ${T=='in'?'sel':''}' onclick="au.tab='in';au.msg='';authView()">Sign in</button><button class='o ${up?'sel':''}' onclick="au.tab='up';au.msg='';authView()">Create account</button></div>
+${au.msg?`<div class='msg ${au.ok?'':'e'}' role='alert'>${esc(au.msg)}</div>`:''}
+${up?`<input id='un' type='text' autocomplete='name' placeholder='Your name' aria-label='Name' value="${esc(au.name||'')}">`:''}
+<input id='ui' type='text' autocomplete='username' placeholder='Email, mobile number or user ID' aria-label='Email, mobile number or user ID' value="${esc(au.id||'')}">
+${rs?`<input id='rc' type='text' autocomplete='off' placeholder='Recovery code (XXXX-XXXX-XXXX)' aria-label='Recovery code'>`:''}
+<input id='up' type='password' autocomplete='${T=='in'?'current-password':'new-password'}' placeholder='${rs?'New password':'Password'}' aria-label='Password' onkeydown="if(event.key=='Enter'){${T=='in'?'doSignIn()':''}}">
+${T!='in'?`<input id='uc' type='password' autocomplete='new-password' placeholder='Confirm password' aria-label='Confirm password' onkeydown="if(event.key=='Enter'){${up?'doSignUp()':'doReset()'}}"><p class='note'>At least 8 characters, with letters and numbers.</p>`:''}
+<label class='note'><input type='checkbox' onchange="document.getElementById('up').type=this.checked?'text':'password'"> Show password</label><br>
+${rs?'':`<label class='note'><input id='uk' type='checkbox'> Keep me signed in on this device</label>`}
+${up&&legacy?`<br><label class='note'><input id='um' type='checkbox' checked> Move the data already saved in this browser into this account</label>`:''}
+<p><button class='big' onclick='${up?'doSignUp()':rs?'doReset()':'doSignIn()'}'>${up?'Create account':rs?'Reset password':'Sign in'}</button></p>
+${T=='in'?`<p><button class='o' onclick="au.tab='reset';au.msg='';authView()">Forgot password?</button></p>`:''}
+${rs?`<p><button class='o' onclick="au.tab='in';au.msg='';authView()">Back to sign in</button> <button class='s' onclick='eraseAcct()'>No recovery code? Erase account</button></p>`:''}
+<p class='note'>Accounts and data are stored only in this browser on this device. There is no email or SMS verification.</p></div>`;
+au.ok=false;const f=document.getElementById(up?'un':'ui');if(f&&!au.msg)f.focus()}
+function authErr(m){au.msg=m;au.ok=false;authView()}
+async function doSignUp(){const name=$('un').value.trim(),raw=$('ui').value,pw=$('up').value,pc=$('uc').value;au.id=raw;au.name=name;
+if(!window.crypto||!crypto.subtle)return authErr('This browser cannot create secure passwords. Open the page in a modern browser over https or on localhost.');
+if(!name)return authErr('Enter your name.');const id=normId(raw);if(!id)return authErr('Enter a valid email, a 10-digit Indian mobile number, or a user ID (3 to 20 letters, numbers, _ or .).');
+if(pw.length<8||!/[A-Za-z]/.test(pw)||!/\d/.test(pw))return authErr('Password must be at least 8 characters with letters and numbers.');
+if(pw!==pc)return authErr('The passwords do not match.');
+const us=users();if(us.some(u=>u.idv==id.v))return authErr('An account with this email, number or ID already exists on this device. Sign in instead.');
+const mv=$('um')&&$('um').checked,keep=$('uk').checked,salt=crypto.getRandomValues(new Uint8Array(16)),u={id:'u'+Date.now().toString(36),name,idt:id.t,idv:id.v,salt:b64(salt),hash:await hashPw(pw,salt),at:Date.now()};
+const code=await setCode(u);us.push(u);saveUsers(us);
+if(mv){try{const old=localStorage.getItem('ss1');if(old){localStorage.setItem('ss1_'+u.id,old);localStorage.removeItem('ss1')}}catch(e){}}
+showCode(code,()=>enter(u,keep))}
+async function doReset(){const raw=$('ui').value,code=$('rc').value,pw=$('up').value,pc=$('uc').value;au.id=raw;
+if(Date.now()<au.lock)return authErr(`Too many attempts. Try again in ${Math.ceil((au.lock-Date.now())/1000)} seconds.`);
+if(!window.crypto||!crypto.subtle)return authErr('This browser cannot create secure passwords.');
+const id=normId(raw),us=users(),u=id&&us.find(x=>x.idv==id.v);if(!u)return authErr('No account found for that email, number or user ID on this device.');
+if(!u.rh)return authErr('This account was created before recovery codes existed, so it has none. You can erase it and create it again.');
+if(pw.length<8||!/[A-Za-z]/.test(pw)||!/\d/.test(pw))return authErr('New password must be at least 8 characters with letters and numbers.');
+if(pw!==pc)return authErr('The passwords do not match.');
+if((await hashPw(normCode(code),unb64(u.rs)))!==u.rh){au.fails++;if(au.fails>=5){au.lock=Date.now()+30000;au.fails=0;return authErr('Too many attempts. Try again in 30 seconds.')}return authErr('That recovery code is not correct.')}
+au.fails=0;const salt=crypto.getRandomValues(new Uint8Array(16));u.salt=b64(salt);u.hash=await hashPw(pw,salt);const ncode=await setCode(u);saveUsers(us);
+showCode(ncode,()=>{au.tab='in';au.msg='Password changed. Sign in with your new password.';au.ok=true;authView()})}
+function eraseAcct(){const id=normId($('ui').value),u=id&&users().find(x=>x.idv==id.v);if(!u)return authErr('Type your email, number or user ID in the first box, then tap Erase account.');cfm('Erase this account and all its data on this device? You can then create it again. This cannot be undone.',()=>{saveUsers(users().filter(x=>x.id!=u.id));try{localStorage.removeItem('ss1_'+u.id)}catch(e){}au.tab='up';authErr('Account erased. You can create it again.')})}
+function forgot(){au.tab='reset';au.msg='';authView()}
+function newCode(){cfm('Create a new recovery code? Your old code will stop working.',async()=>{const us=users(),u=us.find(x=>x.id==USER.id);const code=await setCode(u);saveUsers(us);USER=u;showCode(code,()=>{flash=['','New recovery code saved.'];render()})})}
+function accountCard(){const u=USER;return u?`<div class='c'><h3>Account</h3><p class='note'>Signed in as <b>${esc(u.name)}</b> (${esc(u.idv)}). Accounts on this device: ${users().length}.</p><p class='note'>Recovery code: ${u.rh?'created. It is needed if you forget your password.':'not created yet. Create one so you can reset a forgotten password.'}</p><div class='f'><button class='o' onclick='newCode()'>${u.rh?'Create a new recovery code':'Create recovery code'}</button><button class='o' onclick='signOut()'>Sign out</button></div></div>`:''}
+Object.assign(HI,{'Share':'शेयर','Sign out':'साइन आउट','Share with':'इनके साथ शेयर करें','Saved parents':'सहेजे गए अभिभावक','Save parent':'अभिभावक सहेजें','Link':'लिंक','Copy link':'लिंक कॉपी करें','Copy message':'संदेश कॉपी करें','Email':'ईमेल','WhatsApp':'व्हाट्सएप','Sync':'सिंक','Sync now':'अभी सिंक करें','Account':'खाता','Opening balance':'शुरुआती शेष','Closing balance':'अंतिम शेष','Credits':'कुल जमा','Debits':'कुल डेबिट','All':'सभी','Credit':'जमा','Debit':'डेबिट','Balance':'शेष','Download statement (Excel)':'स्टेटमेंट डाउनलोड करें (Excel)','This month':'इस महीने','Last month':'पिछला महीना','All time':'सभी समय','Daily':'दैनिक','Weekly':'साप्ताहिक','Monthly':'मासिक','Expenses by category':'श्रेणी के अनुसार खर्च','Spending by category':'श्रेणी के अनुसार खर्च','Money flow':'पैसे का प्रवाह','Income and expense trend':'आय और खर्च का रुझान','Total income':'कुल आय','Total expenses':'कुल खर्च','Net saving':'शुद्ध बचत','Average spend':'औसत खर्च','Alerts & reminders':'अलर्ट और रिमाइंडर','Item':'वस्तु','Details':'विवरण','Days left':'बचे दिन','Delete forever':'हमेशा के लिए हटाएँ','Confirm':'पुष्टि करें','Close':'बंद करें','Edit profile':'प्रोफ़ाइल संपादित करें','Your categories':'आपकी श्रेणियाँ','Income':'आय','Spent':'खर्च','Available':'उपलब्ध','Savings goals':'बचत लक्ष्य','Last 30 days':'पिछले 30 दिन','Last 12 weeks':'पिछले 12 सप्ताह','Last 12 months':'पिछले 12 महीने'});
+function cfm(msg,fn,inp){const d=document.createElement('div');d.className='mo';d.innerHTML=`<div class='mb' role='dialog' aria-modal='true'><p>${esc(msg)}</p>${inp!=null?`<input id='mi' value="${esc(inp)}">`:''}<div class='f'><button id='my'>Confirm</button><button class='o' id='mn'>Cancel</button></div></div>`;document.body.appendChild(d);translate();const x=()=>d.remove();$('mn').onclick=x;$('my').onclick=()=>{const v=inp!=null?$('mi').value:null;x();fn(v)};(inp!=null?$('mi'):$('mn')).focus()}
+let tv='daily';
+const kf=v=>v>=100000?(v/100000).toFixed(1).replace('.0','')+'L':v>=1000?(v/1000).toFixed(1).replace('.0','')+'k':String(Math.round(v));
+function smooth(p){if(p.length<2)return '';let d=`M${p[0][0]},${p[0][1]}`;for(let i=0;i<p.length-1;i++){const a=p[i-1]||p[i],b=p[i],c=p[i+1],e=p[i+2]||c;d+=` C${b[0]+(c[0]-a[0])/6},${Math.min(260,b[1]+(c[1]-a[1])/6)} ${c[0]-(e[0]-b[0])/6},${Math.min(260,c[1]-(e[1]-b[1])/6)} ${c[0]},${c[1]}`}return d}
+function trendSeries(){const sR=(ty,a,b)=>sum(S.tx.filter(t=>t.type==ty&&t.date>=a&&t.date<=b));const B=[];
+if(tv=='daily'){const n=new Date();for(let i=29;i>=0;i--){const d=iso(new Date(n.getFullYear(),n.getMonth(),n.getDate()-i));B.push({a:d,b:d,l:fd(d).slice(0,6)})}}
+else{for(let o=11;o>=0;o--){const r=periodRange(tv=='weekly'?'week':'month',o);B.push({a:r[0],b:r[1],l:tv=='weekly'?fd(r[0]).slice(0,6):new Date(r[0]+'T00:00:00').toLocaleDateString('en-IN',{month:'short',year:'2-digit'})})}}
+return B.map(x=>Object.assign(x,{i:sR('income',x.a,x.b),e:sR('expense',x.a,x.b)}))}
+function trendChart(B){const W=640,H=250,pl=44,pr=16,pt=22,pb=34,iw=W-pl-pr,ih=H-pt-pb,mx=Math.max(1,...B.flatMap(x=>[x.i,x.e]))*1.12,base=pt+ih,X=i=>pl+i*iw/(B.length-1),Y=v=>Math.min(base,pt+ih-v/mx*ih);
+const pi=B.map((x,i)=>[X(i),Y(x.i)]),pe=B.map((x,i)=>[X(i),Y(x.e)]),ar=p=>smooth(p)+` L${p[p.length-1][0]},${base} L${p[0][0]},${base} Z`,step=Math.ceil(B.length/7),pk=B.reduce((m,x,i)=>x.e>B[m].e?i:m,0),r=B.length>14?0:4.5;
+const dots=(p,c,k)=>B.map((x,i)=>`<circle cx='${p[i][0]}' cy='${p[i][1]}' r='${r}' fill='${c}' style='stroke:var(--card);stroke-width:2'/><circle cx='${p[i][0]}' cy='${p[i][1]}' r='9' fill='transparent'><title>${x.l}: ${k=='i'?'Income':'Expenses'} ${R(x[k])}</title></circle>`).join('');
+return `<svg viewBox='0 0 ${W} ${H}' style='width:100%;height:auto' role='img' aria-label='Income and expense trend chart'><defs><linearGradient id='gi' x1='0' y1='0' x2='0' y2='1'><stop offset='0%' stop-color='#12a594' stop-opacity='.35'/><stop offset='100%' stop-color='#12a594' stop-opacity='0'/></linearGradient><linearGradient id='ge' x1='0' y1='0' x2='0' y2='1'><stop offset='0%' stop-color='#e0536a' stop-opacity='.35'/><stop offset='100%' stop-color='#e0536a' stop-opacity='0'/></linearGradient></defs>
+${[0,.25,.5,.75,1].map(f=>`<line x1='${pl}' y1='${Y(mx*f)}' x2='${W-pr}' y2='${Y(mx*f)}' stroke='#9aa8c6' stroke-opacity='.3' stroke-dasharray='${f?'4 4':'0'}'/><text x='${pl-6}' y='${Y(mx*f)+4}' font-size='10' text-anchor='end' fill='#9aa8c6'>${kf(mx*f)}</text>`).join('')}
+<path d='${ar(pi)}' fill='url(#gi)'/><path d='${ar(pe)}' fill='url(#ge)'/><path d='${smooth(pi)}' fill='none' stroke='#12a594' stroke-width='3' stroke-linecap='round'/><path d='${smooth(pe)}' fill='none' stroke='#e0536a' stroke-width='3' stroke-linecap='round'/>${dots(pi,'#12a594','i')}${dots(pe,'#e0536a','e')}
+${B[pk].e>0?`<text x='${Math.min(W-pr-30,Math.max(pl+30,pe[pk][0]))}' y='${pe[pk][1]-9}' font-size='11' font-weight='700' text-anchor='middle' fill='#e0536a'>Peak ${kf(B[pk].e)}</text>`:''}
+${B.map((x,i)=>i%step==0||i==B.length-1?`<text x='${X(i)}' y='${H-10}' font-size='10' text-anchor='middle' fill='#9aa8c6'>${x.l}</text>`:'').join('')}</svg><div class='note'><span style='color:#12a594'>\u25cf</span> Income <span style='color:#e0536a'>\u25cf</span> Expenses &middot; hover or tap a point for the amount</div>`}
+function catTrend(){const by=byCat(t=>t.type=='expense'),top=Object.entries(by).sort((a,b)=>b[1]-a[1]).slice(0,4),B=S.tx.length?trendSeries():null,ti=B?sum(B.map(x=>({amount:x.i}))):0,te=B?sum(B.map(x=>({amount:x.e}))):0;
+return `<div class='c'><div class='row' style='margin-top:0;flex-wrap:wrap;align-items:center'><h3 style='margin:0'>Income and expense trend</h3><div class='f' style='margin:0;flex:0 0 auto'>${[['daily','Daily'],['weekly','Weekly'],['monthly','Monthly']].map(x=>`<button class='o ${tv==x[0]?'sel':''}' style='flex:0 0 auto' onclick="tv='${x[0]}';render()">${x[1]}</button>`).join('')}</div></div><p class='note'>${tv=='daily'?'Last 30 days':tv=='weekly'?'Last 12 weeks':'Last 12 months'}</p>${B?`<div class='flow'>${fb('Total income',ti)}${fb('Total expenses',te)}${fb('Net saving',ti-te)}${fb('Average spend',te/B.length)}</div>`+trendChart(B):`<div class='note'>Add transactions to see the trend.</div>`}</div>
+<div class='c'><h3>Money flow</h3><div class='flow'>${fb('Income',inc())}<span class='fa'>\u2192</span><div class='fc'>${fb('Spent',exp())}${fb('Emergency Fund',efBal())}${fb('Savings goals',gSaved())}${fb('Available',avail())}</div></div>${top.length?`<div class='flow'>${fb('All expenses',exp())}<span class='fa'>\u2192</span><div class='fc'>${top.map(x=>fb(esc(x[0]),x[1])).join('')}</div></div>`:''}</div>
+<div class='c'><h3>Spending by category</h3>${pie(by)}</div>`}
+const pages={dashboard:()=>{let h=dashboard();const a=h.indexOf('<div class="c"><h3>Income vs expenses by month'),b=h.indexOf('<div class="c"><h3>Recent transactions');if(a>0&&b>a)h=h.slice(0,a)+h.slice(b);const i=h.indexOf('</p>')+4;return h.slice(0,i)+alertBox()+h.slice(i)},transactions:()=>transactions().replace('<button onclick="addTx()">Save transaction</button>','<button onclick="addTx()">Save transaction</button> <button class="o" onclick="aiCat()">✨ Suggest category</button> <span id="sg" class="note"></span>'),budgets,savings,emergency,insights,categories:()=>categories()+catPeriod()+catTrend(),share:sharePage,statement:()=>statement().replace('Download statement (CSV)','Download statement (Excel)'),trash:trashPage,settings:()=>settings().replace(/<div class='c'><h3>Parent access<\/h3>[\s\S]*?<\/div>/,'')+accountCard()};
+function go(){const a=$("q")&&document.activeElement==$("q");const pos=a?$("q").selectionStart:0;render();if(a){$("q").focus();$("q").setSelectionRange(pos,pos)}}
+function render(){if(RO){document.body.classList.remove('na');const a0=document.getElementById('auth');if(a0)a0.remove()}else if(!USER)return authView();const h0=(location.hash||"#dashboard").slice(1),h=h0=="import"?"importPage":h0;const p=pages[h]?h:"dashboard";
+ $("m").innerHTML=pages[p]();applyTheme();who();translate();document.querySelectorAll("nav a").forEach(a=>a.classList.toggle("on",a.getAttribute("href")=="#"+(p=="importPage"?"import":p)))}
+try{const sid=localStorage.getItem('ss_sess')||sessionStorage.getItem('ss_sess'),su=users().find(x=>x.id==sid);if(su)loadUser(su)}catch(e){}
+addEventListener("hashchange",()=>{wd=null;render()});render();
+(async()=>{try{if(!window.claude)return;const u=await window.claude.use("user"),db=await window.claude.use("db");if(!db)return;dbDoc=db.doc("shared/state");const own=u?await u.isOwner():true;
+if(own){pushDb();render();return}
+RO=true;document.body.classList.add("ro");dbDoc.onSnapshot(s=>{if(s.exists){try{S=Object.assign({tx:[],cats:[],budgets:{},ef:[],goals:[],imports:[],trash:[]},JSON.parse(s.data().json))}catch(e){}}else flash=["w","The student has not shared any data yet."];render()},()=>{})}catch(e){}})();
+</script></body></html>
